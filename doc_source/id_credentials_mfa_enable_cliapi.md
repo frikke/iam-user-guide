@@ -6,13 +6,15 @@ When you enable an MFA device from the AWS Management Console, the console perfo
 
 You can attach tags to your IAM resources, including virtual MFA devices, to identify, organize, and control access to them\. You can tag virtual MFA devices only when you use the AWS CLI or AWS API\.
 
+An IAM user using the SDK or CLI can enable an additional MFA device by calling [https://docs.aws.amazon.com/IAM/latest/APIReference/API_EnableMFADevice.html](https://docs.aws.amazon.com/IAM/latest/APIReference/API_EnableMFADevice.html) or deactivate an existing MFA device by calling [https://docs.aws.amazon.com/IAM/latest/APIReference/API_DeactivateMFADevice.html](https://docs.aws.amazon.com/IAM/latest/APIReference/API_DeactivateMFADevice.html)\. To do this successfully, they must first call [https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html](https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html) and submit MFA codes with an existing MFA device\. This call returns temporary security credentials that can then be used to sign API operations that require MFA authentication\. For an example request and response, see [`GetSessionToken`—temporary credentials for users in untrusted environments](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html#api_getsessiontoken)\. 
+
 **To create the virtual device entity in IAM to represent a virtual MFA device**  
 These commands provide an ARN for the device that is used in place of a serial number in many of the following commands\.
 + AWS CLI: [https://docs.aws.amazon.com/cli/latest/reference/iam/create-virtual-mfa-device.html](https://docs.aws.amazon.com/cli/latest/reference/iam/create-virtual-mfa-device.html) 
 + AWS API: [https://docs.aws.amazon.com/IAM/latest/APIReference/API_CreateVirtualMFADevice.html](https://docs.aws.amazon.com/IAM/latest/APIReference/API_CreateVirtualMFADevice.html) 
 
 **To enable an MFA device for use with AWS**  
-These commands synchronize the device with AWS and associate it with a user or the root user\. If the device is virtual, use the ARN of the virtual device as the serial number\.
+These commands synchronize the device with AWS and associate it with a user\. If the device is virtual, use the ARN of the virtual device as the serial number\.
 
 **Important**  
 Submit your request immediately after generating the authentication codes\. If you generate the codes and then wait too long to submit the request, the MFA device successfully associates with the user but the MFA device becomes out of sync\. This happens because time\-based one\-time passwords \(TOTP\) expire after a short period of time\. If this happens, you can resynchronize the device using the commands described below\.
@@ -55,4 +57,4 @@ After the device is disassociated from the user, you can delete the device entit
 + AWS API: [https://docs.aws.amazon.com/IAM/latest/APIReference/API_DeleteVirtualMFADevice.html](https://docs.aws.amazon.com/IAM/latest/APIReference/API_DeleteVirtualMFADevice.html) 
 
 **To recover a virtual MFA device that is lost or not working**  
-Sometimes, an IAM user's device that hosts the virtual MFA app is lost, replaced, or not working\. When this happens, the user can't recover it on their own\. IAM users must contact an administrator to deactivate the device\. For more information, see [What if an MFA device is lost or stops working?](id_credentials_mfa_lost-or-broken.md)\.
+Sometimes, a user's device that hosts the virtual MFA app is lost, replaced, or not working\. When this happens, the user can't recover it on their own\. The user must contact an administrator to deactivate the device\. For more information, see [What if an MFA device is lost or stops working?](id_credentials_mfa_lost-or-broken.md)\.

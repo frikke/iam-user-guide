@@ -9,41 +9,27 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 #### [ \.NET ]
 
 **AWS SDK for \.NET**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
   
 
 ```
-using Amazon.IdentityManagement;
-using Amazon.IdentityManagement.Model;
-using System;
-
-var client = new AmazonIdentityManagementServiceClient();
-var request = new ListRolePoliciesRequest
-{
-    RoleName = "LambdaS3Role",
-};
-
-var response = new ListRolePoliciesResponse();
-
-do
-{
-    response = await client.ListRolePoliciesAsync(request);
-
-    if (response.PolicyNames.Count > 0)
+    /// <summary>
+    /// List IAM role policies.
+    /// </summary>
+    /// <param name="roleName">The IAM role for which to list IAM policies.</param>
+    /// <returns>A list of IAM policy names.</returns>
+    public async Task<List<string>> ListRolePoliciesAsync(string roleName)
     {
-        response.PolicyNames.ForEach(policyName =>
+        var listRolePoliciesPaginator = _IAMService.Paginators.ListRolePolicies(new ListRolePoliciesRequest { RoleName = roleName });
+        var policyNames = new List<string>();
+
+        await foreach (var response in listRolePoliciesPaginator.Responses)
         {
-            Console.WriteLine($"{policyName}");
-        });
-    }
+            policyNames.AddRange(response.PolicyNames);
+        }
 
-    // As long as response.IsTruncated is true, set request.Marker equal
-    // to response.Marker and call ListRolesAsync again.
-    if (response.IsTruncated)
-    {
-        request.Marker = response.Marker;
+        return policyNames;
     }
-} while (response.IsTruncated);
 ```
 +  For API details, see [ListRolePolicies](https://docs.aws.amazon.com/goto/DotNetSDKV3/iam-2010-05-08/ListRolePolicies) in *AWS SDK for \.NET API Reference*\. 
 
@@ -51,65 +37,79 @@ do
 #### [ Go ]
 
 **SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
   
 
 ```
-	// ListRolePolicies
+// RoleWrapper encapsulates AWS Identity and Access Management (IAM) role actions
+// used in the examples.
+// It contains an IAM service client that is used to perform role actions.
+type RoleWrapper struct {
+	IamClient *iam.Client
+}
 
-	rolePoliciesList, err := service.ListRolePolicies(context.Background(), &iam.ListRolePoliciesInput{
-		RoleName: aws.String(ExampleRoleName),
+
+
+// ListRolePolicies lists the inline policies for a role.
+func (wrapper RoleWrapper) ListRolePolicies(roleName string) ([]string, error) {
+	var policies []string
+	result, err := wrapper.IamClient.ListRolePolicies(context.TODO(), &iam.ListRolePoliciesInput{
+		RoleName: aws.String(roleName),
 	})
-
 	if err != nil {
-		panic("Couldn't list policies for role: " + err.Error())
+		log.Printf("Couldn't list policies for role %v. Here's why: %v\n", roleName, err)
+	} else {
+		policies = result.PolicyNames
 	}
-
-	for _, rolePolicy := range rolePoliciesList.PolicyNames {
-		fmt.Printf("Policy ARN: %v", rolePolicy)
-	}
+	return policies, err
+}
 ```
 +  For API details, see [ListRolePolicies](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.ListRolePolicies) in *AWS SDK for Go API Reference*\. 
 
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 List the policies\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import {ListRolePoliciesCommand} from "@aws-sdk/client-iam";
+import { ListRolePoliciesCommand, IAMClient } from "@aws-sdk/client-iam";
 
-// Set the parameters.
-export const params = {
-    RoleName: 'ROLE_NAME', /* This is a number value. Required */
-    Marker: 'MARKER', /* This is a string value. Optional */
-    MaxItems: 'MAX_ITEMS' /* This is a number value. Optional */
-};
+const client = new IAMClient({});
 
-export const run = async () => {
-    try {
-        const results = await iamClient.send(new ListRolePoliciesCommand(params));
-        console.log("Success", results);
-        return results;
-    } catch (err) {
-        console.log("Error", err);
+/**
+ * A generator function that handles paginated results.
+ * The AWS SDK for JavaScript (v3) provides {@link https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/index.html#paginators | paginator} functions to simplify this.
+ *
+ * @param {string} roleName
+ */
+export async function* listRolePolicies(roleName) {
+  const command = new ListRolePoliciesCommand({
+    RoleName: roleName,
+    MaxItems: 10,
+  });
+
+  let response = await client.send(command);
+
+  while (response.PolicyNames?.length) {
+    for (const policyName of response.PolicyNames) {
+      yield policyName;
     }
+
+    if (response.IsTruncated) {
+      response = await client.send(
+        new ListRolePoliciesCommand({
+          RoleName: roleName,
+          MaxItems: 10,
+          Marker: response.Marker,
+        })
+      );
+    } else {
+      break;
+    }
+  }
 }
-run();
 ```
 +  For API details, see [ListRolePolicies](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/listrolepoliciescommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
@@ -117,12 +117,12 @@ run();
 #### [ PHP ]
 
 **SDK for PHP**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
   
 
 ```
 $uuid = uniqid();
-$service = new IamService();
+$service = new IAMService();
 
     public function listRolePolicies($roleName, $marker = "", $maxItems = 0)
     {
@@ -144,7 +144,7 @@ $service = new IamService();
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```
@@ -169,7 +169,7 @@ def list_policies(role_name):
 
 **SDK for Rust**  
 This documentation is for an SDK in preview release\. The SDK is subject to change and should not be used in production\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
   
 
 ```
@@ -191,6 +191,42 @@ pub async fn list_role_policies(
 }
 ```
 +  For API details, see [ListRolePolicies](https://docs.rs/releases/search?query=aws-sdk) in *AWS SDK for Rust API reference*\. 
+
+------
+#### [ Swift ]
+
+**SDK for Swift**  
+This is prerelease documentation for an SDK in preview release\. It is subject to change\.
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/swift/example_code/iam#code-examples)\. 
+  
+
+```
+    public func listRolePolicies(role: String) async throws -> [String] {
+        var policyList: [String] = []
+        var marker: String? = nil
+        var isTruncated: Bool
+        
+        repeat {
+            let input = ListRolePoliciesInput(
+                marker: marker,
+                roleName: role
+            )
+            let output = try await client.listRolePolicies(input: input)
+            
+            guard let policies = output.policyNames else {
+                return policyList
+            }
+
+            for policy in policies {
+                policyList.append(policy)
+            }
+            marker = output.marker
+            isTruncated = output.isTruncated
+        } while isTruncated == true
+        return policyList
+    }
+```
++  For API details, see [ListRolePolicies](https://awslabs.github.io/aws-sdk-swift/reference/0.x) in *AWS SDK for Swift API reference*\. 
 
 ------
 

@@ -1,19 +1,19 @@
 # Access Analyzer policy check reference<a name="access-analyzer-reference-policy-checks"></a>
 
-You can validate your policies using AWS IAM Access Analyzer policy checks\. You can create or edit a policy using the AWS CLI, AWS API, or JSON policy editor in the IAM console\. Access Analyzer validates your policy against IAM [policy grammar](reference_policies_grammar.md) and [best practices](best-practices.md)\. You can view policy validation check findings that include security warnings, errors, general warnings, and suggestions for your policy\. These findings provide actionable recommendations that help you author policies that are functional and conform to security best practices\. To learn more about validating policies using Access Analyzer, see [Access Analyzer policy validation](access-analyzer-policy-validation.md)\.
+You can validate your policies using AWS IAM Access Analyzer policy checks\. You can create or edit a policy using the AWS CLI, AWS API, or JSON policy editor in the IAM console\. Access Analyzer validates your policy against IAM [policy grammar](reference_policies_grammar.md) and [best practices](best-practices.md)\. You can view policy validation check findings that include security warnings, errors, general warnings, and suggestions for your policy\. These findings provide actionable recommendations that help you author policies that are functional and conform to security best practices\. To learn more about validating policies using Access Analyzer, see [IAM Access Analyzer policy validation](access-analyzer-policy-validation.md)\.
 
 ## Error – ARN account not allowed<a name="access-analyzer-reference-policy-checks-error-arn-account-not-allowed"></a>
 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-ARN account not allowed: The service does not support specifying an account ID in the resource ARN.
+ARN account not allowed: The service {{service}} does not support specifying an account ID in the resource ARN.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The service does not support specifying an account ID in the resource ARN."
+"findingDetails": "The service {{service}} does not support specifying an account ID in the resource ARN."
 ```
 
 **Resolving the error**
@@ -33,13 +33,13 @@ For example, Amazon S3 does not support an account ID as a namespace in bucket A
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-ARN Region not allowed: The service does not support specifying a Region in the resource ARN.
+ARN Region not allowed: The service {{service}} does not support specifying a Region in the resource ARN.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The service does not support specifying a Region in the resource ARN."
+"findingDetails": "The service {{service}} does not support specifying a Region in the resource ARN."
 ```
 
 **Resolving the error**
@@ -56,13 +56,13 @@ For example, IAM is a global service\. The Region portion of an IAM resource ARN
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Data type mismatch: The text does not match the expected JSON data type {{data_type)).
+Data type mismatch: The text does not match the expected JSON data type {{data_type}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The text does not match the expected JSON data type {{data_type))."
+"findingDetails": "The text does not match the expected JSON data type {{data_type}}."
 ```
 
 **Resolving the error**
@@ -80,13 +80,13 @@ For example, the `Version` global condition key requires a `String` data type\. 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Duplicate keys with different case: The condition key appears more than once with different capitalization in the same condition block. Remove the duplicate condition keys.
+Duplicate keys with different case: The condition key {{key}} appears more than once with different capitalization in the same condition block. Remove the duplicate condition keys.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The condition key appears more than once with different capitalization in the same condition block. Remove the duplicate condition keys."
+"findingDetails": "The condition key {{key}} appears more than once with different capitalization in the same condition block. Remove the duplicate condition keys."
 ```
 
 **Resolving the error**
@@ -106,13 +106,13 @@ A *condition block* is the text within the `Condition` element of a policy state
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid action: The action does not exist. Did you mean ?
+Invalid action: The action {{action}} does not exist. Did you mean {{valid_action}}?
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The action does not exist. Did you mean ?"
+"findingDetails": "The action {{action}} does not exist. Did you mean {{valid_action}}?"
 ```
 
 **Resolving the error**
@@ -136,13 +136,13 @@ The following AWS managed policies include invalid actions in their policy state
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid ARN account: The resource ARN account ID is not valid. Provide a 12-digit account ID.
+Invalid ARN account: The resource ARN account ID {{account}} is not valid. Provide a 12-digit account ID.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The resource ARN account ID is not valid. Provide a 12-digit account ID."
+"findingDetails": "The resource ARN account ID {{account}} is not valid. Provide a 12-digit account ID."
 ```
 
 **Resolving the error**
@@ -183,13 +183,13 @@ AWS resource ARNs must include the required `arn:` prefix\.
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid ARN Region: The Region is not valid for this resource. Update the resource ARN to include a supported Region.
+Invalid ARN Region: The Region {{region}} is not valid for this resource. Update the resource ARN to include a supported Region.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The Region is not valid for this resource. Update the resource ARN to include a supported Region."
+"findingDetails": "The Region {{region}} is not valid for this resource. Update the resource ARN to include a supported Region."
 ```
 
 **Resolving the error**
@@ -229,13 +229,13 @@ The resource ARN must match the specifications for known resource types\. To vie
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid ARN service case: Update the service name in the resource ARN to use all lowercase letters.
+Invalid ARN service case: Update the service name ${service} in the resource ARN to use all lowercase letters.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Update the service name in the resource ARN to use all lowercase letters."
+"findingDetails": "Update the service name ${service} in the resource ARN to use all lowercase letters."
 ```
 
 **Resolving the error**
@@ -325,13 +325,13 @@ To view the condition keys for a service, see [Actions, resources, and condition
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid condition operator: The condition operator is not valid. Use a valid condition operator.
+Invalid condition operator: The condition operator {{operator}} is not valid. Use a valid condition operator.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The condition operator is not valid. Use a valid condition operator."
+"findingDetails": "The condition operator {{operator}} is not valid. Use a valid condition operator."
 ```
 
 **Resolving the error**
@@ -348,13 +348,13 @@ Update the condition to use a supported condition operator\.
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid effect: The effect is not valid. Use Allow or Deny.
+Invalid effect: The effect {{effect}} is not valid. Use Allow or Deny.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The effect is not valid. Use Allow or Deny."
+"findingDetails": "The effect {{effect}} is not valid. Use Allow or Deny."
 ```
 
 **Resolving the error**
@@ -370,13 +370,13 @@ Update the `Effect` element to use a valid effect\. Valid values for `Effect` 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid global condition key: The condition key does not exist. Use a valid condition key.
+Invalid global condition key: The condition key {{key}} does not exist. Use a valid condition key.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The condition key does not exist. Use a valid condition key."
+"findingDetails": "The condition key {{key}} does not exist. Use a valid condition key."
 ```
 
 **Resolving the error**
@@ -393,13 +393,13 @@ Global condition keys are condition keys with an `aws:` prefix\. AWS services 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid partition: The resource ARN for the service does not support the partition. Use the supported values:
+Invalid partition: The resource ARN for the service {{service}} does not support the partition {{partition}}. Use the supported values: {{partitions}}
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The resource ARN for the service does not support the partition. Use the supported values:"
+"findingDetails": "The resource ARN for the service {{service}} does not support the partition {{partition}}. Use the supported values: {{partitions}}"
 ```
 
 **Resolving the error**
@@ -409,20 +409,20 @@ Update the resource ARN to include a supported partition\. If you included a sup
 A *partition* is a group of AWS Regions\. Each AWS account is scoped to one partition\. In Classic Regions, use the `aws` partition\. In China Regions, use `aws-cn`\.
 
 **Related terms**
-+ [Amazon Resource Names \(ARNs\) \- Partitions](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html )
++ [Amazon Resource Names \(ARNs\) \- Partitions](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
 
 ## Error – Invalid policy element<a name="access-analyzer-reference-policy-checks-error-invalid-policy-element"></a>
 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid policy element: The policy element is not valid.
+Invalid policy element: The policy element {{element}} is not valid.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The policy element is not valid."
+"findingDetails": "The policy element {{element}} is not valid."
 ```
 
 **Resolving the error**
@@ -467,13 +467,13 @@ For example, to define access for everyone in an AWS account, use the following 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid principal key: The principal key is not valid.
+Invalid principal key: The principal key {{principal-key}} is not valid.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The principal key is not valid."
+"findingDetails": "The principal key {{principal-key}} is not valid."
 ```
 
 **Resolving the error**
@@ -492,13 +492,13 @@ Update the key in the principal key\-value pair to use a supported principal key
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid Region: The Region is not valid. Update the condition value to a suported Region.
+Invalid Region: The Region {{region}} is not valid. Update the condition value to a suported Region.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The Region is not valid. Update the condition value to a suported Region."
+"findingDetails": "The Region {{region}} is not valid. Update the condition value to a suported Region."
 ```
 
 **Resolving the error**
@@ -515,13 +515,13 @@ Update the value of the condition key\-value pair to include a supported Region\
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid service: The service does not exist. Use a valid service name.
+Invalid service: The service {{service}} does not exist. Use a valid service name.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The service does not exist. Use a valid service name."
+"findingDetails": "The service {{service}} does not exist. Use a valid service name."
 ```
 
 **Resolving the error**
@@ -536,13 +536,13 @@ The service prefix in the action or condition key must match the specifications 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid service condition key: The condition key does not exist in the service. Use a valid condition key.
+Invalid service condition key: The condition key {{key}} does not exist in the service {{service}}. Use a valid condition key.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The condition key does not exist in the service. Use a valid condition key."
+"findingDetails": "The condition key {{key}} does not exist in the service {{service}}. Use a valid condition key."
 ```
 
 **Resolving the error**
@@ -558,13 +558,13 @@ Update the key in the condition key\-value pair to use a known condition key for
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid service in action: The service specified in the action does not exist. Did you mean ?
+Invalid service in action: The service {{service}} specified in the action does not exist. Did you mean {{service2}}?
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The service specified in the action does not exist. Did you mean ?"
+"findingDetails": "The service {{service}} specified in the action does not exist. Did you mean {{service2}}?"
 ```
 
 **Resolving the error**
@@ -602,13 +602,13 @@ You can use policy variables in the `Resource` element and in string compariso
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid version: The version is not valid. Use one of the following versions:
+Invalid version: The version ${version} is not valid. Use one of the following versions: ${versions}
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The version is not valid. Use one of the following versions:"
+"findingDetails": "The version ${version} is not valid. Use one of the following versions: ${versions}"
 ```
 
 **Resolving the error**
@@ -627,13 +627,13 @@ The `Version` policy element specifies the language syntax rules that AWS uses
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Json syntax error: Fix the JSON syntax error at index line column.
+Json syntax error: Fix the JSON syntax error at index {{index}} line {{line}} column {{column}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Fix the JSON syntax error at index line column."
+"findingDetails": "Fix the JSON syntax error at index {{index}} line {{line}} column {{column}}."
 ```
 
 **Resolving the error**
@@ -696,13 +696,13 @@ AWS JSON policies must include an `Action` or `NotAction` element\.
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Missing ARN field: Resource ARNs must include at least fields in the following structure: arn:partition:service:region:account:resource
+Missing ARN field: Resource ARNs must include at least {{fields}} fields in the following structure: arn:partition:service:region:account:resource
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Resource ARNs must include at least fields in the following structure: arn:partition:service:region:account:resource"
+"findingDetails": "Resource ARNs must include at least {{fields}} fields in the following structure: arn:partition:service:region:account:resource"
 ```
 
 **Resolving the error**
@@ -719,13 +719,13 @@ All of the fields in the resource ARN must match the specifications for a known 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Missing ARN Region: Add a Region to the resource ARN.
+Missing ARN Region: Add a Region to the {{service}} resource ARN.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Add a Region to the resource ARN."
+"findingDetails": "Add a Region to the {{service}} resource ARN."
 ```
 
 **Resolving the error**
@@ -792,13 +792,13 @@ For example, to define access for everyone in an AWS account, use the following 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Missing qualifier: The request context key has multiple values. Use the ForAllValues or ForAnyValue condition key qualifiers in your policy.
+Missing qualifier: The request context key ${key} has multiple values. Use the ForAllValues or ForAnyValue condition key qualifiers in your policy.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The request context key has multiple values. Use the ForAllValues or ForAnyValue condition key qualifiers in your policy."
+"findingDetails": "The request context key ${key} has multiple values. Use the ForAllValues or ForAnyValue condition key qualifiers in your policy."
 ```
 
 **Resolving the error**
@@ -889,13 +889,13 @@ You can add `IfExists` to the end of any condition operator name except the `
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-SCP syntax error action wildcard: SCP actions can include wildcards (*) only at the end of a string. Update.
+SCP syntax error action wildcard: SCP actions can include wildcards (*) only at the end of a string. Update {{action}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "SCP actions can include wildcards (*) only at the end of a string. Update."
+"findingDetails": "SCP actions can include wildcards (*) only at the end of a string. Update {{action}}."
 ```
 
 **Resolving the error**
@@ -1066,13 +1066,13 @@ For some policy types, statement IDs must be unique\. The `Sid` \(statement ID\)
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Unsupported action in policy: The action is not supported for the resource-based policy attached to the resource type.
+Unsupported action in policy: The action {{action}} is not supported for the resource-based policy attached to the resource type {{resourceType}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The action is not supported for the resource-based policy attached to the resource type."
+"findingDetails": "The action {{action}} is not supported for the resource-based policy attached to the resource type {{resourceType}}."
 ```
 
 **Resolving the error**
@@ -1087,13 +1087,13 @@ Some actions aren't supported in the `Action` element in the resource\-based pol
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Unsupported element combination: The policy elements and can not be used in the same statement. Remove one of these elements.
+Unsupported element combination: The policy elements ${element1} and ${element2} can not be used in the same statement. Remove one of these elements.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The policy elements and can not be used in the same statement. Remove one of these elements."
+"findingDetails": "The policy elements ${element1} and ${element2} can not be used in the same statement. Remove one of these elements."
 ```
 
 **Resolving the error**
@@ -1130,13 +1130,13 @@ AWS does not support using the specified global condition key\. Depending on you
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Unsupported principal: The policy type does not support the Principal element. Remove the Principal element.
+Unsupported principal: The policy type ${policy_type} does not support the Principal element. Remove the Principal element.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The policy type does not support the Principal element. Remove the Principal element."
+"findingDetails": "The policy type ${policy_type} does not support the Principal element. Remove the Principal element."
 ```
 
 **Resolving the error**
@@ -1152,13 +1152,13 @@ The `Principal` element specifies the principal that is allowed or denied access
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Unsupported resource ARN in policy: The resource ARN is not supported for the resource-based policy attached to the resource type.
+Unsupported resource ARN in policy: The resource ARN is not supported for the resource-based policy attached to the resource type {{resourceType}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The resource ARN is not supported for the resource-based policy attached to the resource type."
+"findingDetails": "The resource ARN is not supported for the resource-based policy attached to the resource type {{resourceType}}."
 ```
 
 **Resolving the error**
@@ -1194,13 +1194,13 @@ The `Sid` element supports uppercase letters, lowercase letters, and numbers\.
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Unsupported wildcard in principal: Wildcards (*, ?) are not supported with the principal key. Replace the wildcard with a valid principal value.
+Unsupported wildcard in principal: Wildcards (*, ?) are not supported with the principal key {{principal_key}}. Replace the wildcard with a valid principal value.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Wildcards (*, ?) are not supported with the principal key. Replace the wildcard with a valid principal value."
+"findingDetails": "Wildcards (*, ?) are not supported with the principal key {{principal_key}}. Replace the wildcard with a valid principal value."
 ```
 
 **Resolving the error**
@@ -1231,52 +1231,6 @@ In programmatic calls to the AWS CLI or AWS API, the finding for this check incl
 Policy variable structure supports using a `$` prefix followed by a pair of curly braces \(`{ }`\)\. Inside the `${ }` characters, include the name of the value from the request that you want to use in the policy\.
 
 To resolve this finding, add the missing brace to make sure the full opening and closing set of braces is present\.
-
-**Related terms**
-+ [IAM policy elements: Variables](reference_policies_variables.md)
-
-## Error – Unsupported symbol in variable<a name="access-analyzer-reference-policy-checks-error-unsupported-symbol-in-variable"></a>
-
-In the AWS Management Console, the finding for this check includes the following message:
-
-```
-Unsupported symbol in variable: The symbol is not supported within the policy variable text. Remove the symbol.
-```
-
-In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
-
-```
-"findingDetails": "The symbol is not supported within the policy variable text. Remove the symbol."
-```
-
-**Resolving the error**
-
-Policy variable structure supports using a `$` prefix followed by a pair of curly braces \(`{ }`\)\. Inside the `${ }` characters, include the name of the value from the request that you want to use in the policy\.
-
-To resolve this finding, remove the unsupported symbol\.
-
-**Related terms**
-+ [IAM policy elements: Variables](reference_policies_variables.md)
-
-## Error – Unsupported symbol in variable<a name="access-analyzer-reference-policy-checks-error-unsupported-symbol-in-variable"></a>
-
-In the AWS Management Console, the finding for this check includes the following message:
-
-```
-Unsupported symbol in variable: The symbol is not supported within the policy variable. Use instead.
-```
-
-In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
-
-```
-"findingDetails": "The symbol is not supported within the policy variable. Use instead."
-```
-
-**Resolving the error**
-
-Policy variable structure supports using a `$` prefix followed by a pair of curly braces \(`{ }`\)\. Inside the `${ }` characters, include the name of the value from the request that you want to use in the policy\.
-
-To resolve this finding, remove the unsupported symbol\.
 
 **Related terms**
 + [IAM policy elements: Variables](reference_policies_variables.md)
@@ -1336,13 +1290,13 @@ Policy variable structure supports using a `$` prefix followed by a pair of curl
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Empty variable: Empty policy variable. Remove the variable structure or provide a variable within the structure.
+Empty variable: Empty policy variable. Remove the ${ } variable structure or provide a variable within the structure.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Empty policy variable. Remove the variable structure or provide a variable within the structure."
+"findingDetails": "Empty policy variable. Remove the ${ } variable structure or provide a variable within the structure."
 ```
 
 **Resolving the error**
@@ -1357,13 +1311,13 @@ Policy variable structure supports using a `$` prefix followed by a pair of curl
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Variable unsupported in element: Policy variables are supported in the Resource and Condition elements. Remove the policy variable from this element.
+Variable unsupported in element: Policy variables are supported in the Resource and Condition elements. Remove the policy variable {{variable}} from this element.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Policy variables are supported in the Resource and Condition elements. Remove the policy variable from this element."
+"findingDetails": "Policy variables are supported in the Resource and Condition elements. Remove the policy variable {{variable}} from this element."
 ```
 
 **Resolving the error**
@@ -1396,28 +1350,6 @@ A `Version` policy element is different from a policy version\. The `Version` po
 **Related terms**
 + [IAM policy elements: Variables](reference_policies_variables.md)
 + [IAM JSON policy elements: Version](reference_policies_elements_version.md)
-
-## Error – Unsupported condition key for service principal<a name="access-analyzer-reference-policy-checks-error-unsupported-condition-key-for-service-principal"></a>
-
-In the AWS Management Console, the finding for this check includes the following message:
-
-```
-Unsupported condition key for service principal: The following condition keys are not supported when used with the service principal:.
-```
-
-In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
-
-```
-"findingDetails": "The following condition keys are not supported when used with the service principal:."
-```
-
-**Resolving the error**
-
-You can specify AWS services in the `Principal` element of a resource\-based policy using a *service principal*, which is an identifier for the service\. You can't use some condition keys with certain service principals\. For example, you can't use the `aws:PrincipalOrgID` condition key with the service principal `cloudfront.amazonaws.com`\. You should remove condition keys that do not apply to the service principal in the `Principal` element\.
-
-**Related terms**
-+ [Service principals](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html#principal-services)
-+ [JSON policy elements: Principal](reference_policies_elements_principal.md)
 
 ## Error – Private IP address<a name="access-analyzer-reference-policy-checks-error-private-ip-address"></a>
 
@@ -1464,13 +1396,13 @@ The global condition key `aws:SourceIp` works only for public IP address ranges\
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Policy size exceeds SCP quota: The characters in the service control policy (SCP) exceed the character maximum for SCPs. We recommend that you use multiple granular policies.
+Policy size exceeds SCP quota: The {{policySize}} characters in the service control policy (SCP) exceed the {{policySizeQuota}} character maximum for SCPs. We recommend that you use multiple granular policies.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The characters in the service control policy (SCP) exceed the character maximum for SCPs. We recommend that you use multiple granular policies."
+"findingDetails": "The {{policySize}} characters in the service control policy (SCP) exceed the {{policySizeQuota}} character maximum for SCPs. We recommend that you use multiple granular policies."
 ```
 
 **Resolving the error**
@@ -1488,13 +1420,13 @@ To specify multiple actions, AWS recommends that you list them individually\.
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid service principal format: The service principal does not match the expected format. Use the format with all lowercase letters.
+Invalid service principal format: The service principal does not match the expected format. Use the format {{expectedFormat}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The service principal does not match the expected format. Use the format with all lowercase letters."
+"findingDetails": "The service principal does not match the expected format. Use the format {{expectedFormat}}."
 ```
 
 **Resolving the error**
@@ -1521,13 +1453,13 @@ Some service\-specific keys may use a different format for service principals\. 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Missing tag key in condition: The condition key must include a tag key to control access based on tags. Use the format tag-key and specify a key name for tag-key.
+Missing tag key in condition: The condition key {{conditionKeyName}} must include a tag key to control access based on tags. Use the format {{conditionKeyName}}tag-key and specify a key name for tag-key.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The condition key must include a tag key to control access based on tags. Use the format tag-key and specify a key name for tag-key."
+"findingDetails": "The condition key {{conditionKeyName}} must include a tag key to control access based on tags. Use the format {{conditionKeyName}}tag-key and specify a key name for tag-key."
 ```
 
 **Resolving the error**
@@ -1617,13 +1549,13 @@ The `Principal` element uses federated principals for trust policies attached to
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Unsupported action for condition key: The following actions: are not supported by the condition key. The condition will not be evaluated for these actions. We recommend that you move these actions to a different statement without this condition key.
+Unsupported action for condition key: The following actions: {{actions}} are not supported by the condition key {{key}}. The condition will not be evaluated for these actions. We recommend that you move these actions to a different statement without this condition key.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The following actions: are not supported by the condition key. The condition will not be evaluated for these actions. We recommend that you move these actions to a different statement without this condition key."
+"findingDetails": "The following actions: {{actions}} are not supported by the condition key {{key}}. The condition will not be evaluated for these actions. We recommend that you move these actions to a different statement without this condition key."
 ```
 
 **Resolving the error**
@@ -1635,6 +1567,218 @@ If the `Action` element has actions with wildcards, IAM Access Analyzer doesn't 
 
 **Related terms**
 + [JSON policy elements: Action](reference_policies_elements_action.md)
+
+## Error – Unsupported action in policy<a name="access-analyzer-reference-policy-checks-error-unsupported-action-in-policy"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Unsupported action in policy: The action {{action}} is not supported for the resource-based policy attached to the resource type {{resourceType}}.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "The action {{action}} is not supported for the resource-based policy attached to the resource type {{resourceType}}."
+```
+
+**Resolving the error**
+
+Some actions aren't supported in the `Action` element in the resource\-based policy attached to a different resource type\. For example, AWS Key Management Service actions aren't supported in Amazon S3 bucket policies\. Specify an action that is supported by resource type attached to your resource\-based policy\.
+
+**Related terms**
++ [JSON policy elements: Action](reference_policies_elements_action.md)
+
+## Error – Unsupported resource ARN in policy<a name="access-analyzer-reference-policy-checks-error-unsupported-resource-arn-in-policy"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Unsupported resource ARN in policy: The resource ARN is not supported for the resource-based policy attached to the resource type {{resourceType}}.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "The resource ARN is not supported for the resource-based policy attached to the resource type {{resourceType}}."
+```
+
+**Resolving the error**
+
+Some resource ARNs aren't supported in the `Resource` element of the resource\-based policy when the policy is attached to a different resource type\. For example, AWS KMS ARNs aren't supported in the `Resource` element for Amazon S3 bucket policies\. Specify a resource ARN that is supported by a resource type attached to your resource\-based policy\.
+
+**Related terms**
++ [JSON policy elements: Action](reference_policies_elements_action.md)
+
+## Error – Unsupported condition key for service principal<a name="access-analyzer-reference-policy-checks-error-unsupported-condition-key-for-service-principal"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Unsupported condition key for service principal: The following condition keys are not supported when used with the service principal: {{conditionKeys}}.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "The following condition keys are not supported when used with the service principal: {{conditionKeys}}."
+```
+
+**Resolving the error**
+
+You can specify AWS services in the `Principal` element of a resource\-based policy using a *service principal*, which is an identifier for the service\. You can't use some condition keys with certain service principals\. For example, you can't use the `aws:PrincipalOrgID` condition key with the service principal `cloudfront.amazonaws.com`\. You should remove condition keys that do not apply to the service principal in the `Principal` element\.
+
+**Related terms**
++ [Service principals](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html#principal-services)
++ [JSON policy elements: Principal](reference_policies_elements_principal.md)
+
+## Error – Role trust policy syntax error notprincipal<a name="access-analyzer-reference-policy-checks-error-role-trust-policy-syntax-error-notprincipal"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Role trust policy syntax error notprincipal: Role trust policies do not support NotPrincipal. Update the policy to use a Principal element instead.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "Role trust policies do not support NotPrincipal. Update the policy to use a Principal element instead."
+```
+
+**Resolving the error**
+
+A role trust policy is a resource\-based policy that is attached to an IAM role\. Trust policies define which principal entities \(accounts, users, roles, and federated users\) can assume the role\. Role trust policies do not support `NotPrincipal`\. Update the policy to use a `Principal` element instead\.
+
+**Related terms**
++ [JSON policy elements: Principal](reference_policies_elements_principal.md)
++ [JSON policy elements: NotPrincipal](reference_policies_elements_notprincipal.md)
+
+## Error – Role trust policy unsupported wildcard in principal<a name="access-analyzer-reference-policy-checks-error-role-trust-policy-unsupported-wildcard-in-principal"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Role trust policy unsupported wildcard in principal: "Principal:" "*" is not supported in the principal element of a role trust policy. Replace the wildcard with a valid principal value.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": ""Principal:" "*" is not supported in the principal element of a role trust policy. Replace the wildcard with a valid principal value."
+```
+
+**Resolving the error**
+
+A role trust policy is a resource\-based policy that is attached to an IAM role\. Trust policies define which principal entities \(accounts, users, roles, and federated users\) can assume the role\. `"Principal:" "*"` is not supported in the `Principal` element of a role trust policy\. Replace the wildcard with a valid principal value\.
+
+**Related terms**
++ [JSON policy elements: Principal](reference_policies_elements_principal.md)
+
+## Error – Role trust policy syntax error resource<a name="access-analyzer-reference-policy-checks-error-role-trust-policy-syntax-error-resource"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Role trust policy syntax error resource: Role trust policies apply to the role that they are attached to. You cannot specify a resource. Remove the Resource or NotResource element.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "Role trust policies apply to the role that they are attached to. You cannot specify a resource. Remove the Resource or NotResource element."
+```
+
+**Resolving the error**
+
+A role trust policy is a resource\-based policy that is attached to an IAM role\. Trust policies define which principal entities \(accounts, users, roles, and federated users\) can assume the role\. Role trust policies apply to the role that they are attached to\. You cannot specify a `Resource` or `NotResource` element in a role trust policy\. Remove the `Resource` or `NotResource` element\.
++ [JSON policy elements: Resource](reference_policies_elements_resource.md)
++ [JSON policy elements: NotResource](reference_policies_elements_notresource.md)
+
+## Error – Missing action for condition key<a name="access-analyzer-reference-policy-checks-error-missing-action-for-condition-key"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Missing action for condition key: The {{actionName}} action must be in the action block to allow setting values for the condition key {{keyName}}. Add {{actionName}} to the action block.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "The {{actionName}} action must be in the action block to allow setting values for the condition key {{keyName}}. Add {{actionName}} to the action block."
+```
+
+**Resolving the error**
+
+The condition key in the `Condition` element of the policy statement is not evaluated unless the specified action is in the `Action` element\. To ensure that the condition keys you specify are effectively allowed or denied by your policy, add the action to the `Action` element\.
+
+**Related terms**
++ [JSON policy elements: Action](reference_policies_elements_action.md)
+
+## Error – Invalid federated principal syntax in role trust policy<a name="access-analyzer-reference-policy-checks-error-invalid-federated-principal-syntax-in-role-trust-policy"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Invalid federated principal syntax in role trust policy: The principal value specifies a federated principal that does not match the expected format. Update the federated principal to a domain name or a SAML metadata ARN.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "The principal value specifies a federated principal that does not match the expected format. Update the federated principal to a domain name or a SAML metadata ARN."
+```
+
+**Resolving the error**
+
+The principal value specifies a federated principal that does not match the expected format\. Update the format of the federated principal to a valid domain name or a SAML metadata ARN\.
+
+**Related terms**
++ [Federated users and roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction_access-management.html#intro-access-roles)
+
+## Error – Mismatched action for principal<a name="access-analyzer-reference-policy-checks-error-mismatched-action-for-principal"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Mismatched action for principal: The {{actionName}} action is invalid with the following principal(s): {{principalNames}}. Use a SAML provider principal with the sts:AssumeRoleWithSAML action or use an OIDC provider principal with the sts:AssumeRoleWithWebIdentity action. Ensure the provider is Federated if you use either of the two options.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "The {{actionName}} action is invalid with the following principal(s): {{principalNames}}. Use a SAML provider principal with the sts:AssumeRoleWithSAML action or use an OIDC provider principal with the sts:AssumeRoleWithWebIdentity action. Ensure the provider is Federated if you use either of the two options."
+```
+
+**Resolving the error**
+
+The action specified in the `Action` element of the policy statement is invalid with the principal specified in the `Principal` element\. For example, you can't use a SAML provider principal with the `sts:AssumeRoleWithWebIdentity` action\. You should use a SAML provider principal with the `sts:AssumeRoleWithSAML` action or use an OIDC provider principal with the `sts:AssumeRoleWithWebIdentity` action\.
+
+**Related terms**
++ [AssumeRoleWithSAML](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithSAML.html)
++ [AssumeRoleWithWebIdentity](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html)
+
+## Error – Missing action for roles anywhere trust policy<a name="access-analyzer-reference-policy-checks-error-missing-action-for-roles-anywhere-trust-policy"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Missing action for roles anywhere trust policy: The rolesanywhere.amazonaws.com service principal requires the sts:AssumeRole, sts:SetSourceIdentity, and sts:TagSession permissions to assume a role. Add the missing permissions to the policy.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "The rolesanywhere.amazonaws.com service principal requires the sts:AssumeRole, sts:SetSourceIdentity, and sts:TagSession permissions to assume a role. Add the missing permissions to the policy."
+```
+
+**Resolving the error**
+
+For IAM Roles Anywhere to be able to assume a role and deliver temporary AWS credentials, the role must trust the IAM Roles Anywhere service principal\. The IAM Roles Anywhere service principal requires the `sts:AssumeRole`, `sts:SetSourceIdentity`, and `sts:TagSession` permissions to assume a role\. If any of the permissions are missing, you must add them to your policy\.
+
+**Related terms**
++ [Trust model in AWS Identity and Access Management Roles Anywhere](https://docs.aws.amazon.com/rolesanywhere/latest/userguide/trust-model.html)
 
 ## General Warning – Create SLR with NotResource<a name="access-analyzer-reference-policy-checks-general-warning-create-slr-with-not-resource"></a>
 
@@ -1786,13 +1930,13 @@ The action `iam:CreateServiceLinkedRole` grants permission to create an IAM role
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Deprecated global condition key: We recommend that you update aws:ARN to use the newer condition keys aws:PrincipalArn or aws:SourceArn.
+Deprecated global condition key: We recommend that you update aws:ARN to use the newer condition key aws:PrincipalArn.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "We recommend that you update aws:ARN to use the newer condition keys aws:PrincipalArn or aws:SourceArn."
+"findingDetails": "We recommend that you update aws:ARN to use the newer condition key aws:PrincipalArn."
 ```
 
 **Resolving the general warning**
@@ -1805,13 +1949,13 @@ The policy includes a deprecated global condition key\. Update the condition key
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid date value: The date might not resolve as expected. We recommend that you use the YYYY-MM-DD format.
+Invalid date value: The date {{date}} might not resolve as expected. We recommend that you use the YYYY-MM-DD format.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The date might not resolve as expected. We recommend that you use the YYYY-MM-DD format."
+"findingDetails": "The date {{date}} might not resolve as expected. We recommend that you use the YYYY-MM-DD format."
 ```
 
 **Resolving the general warning**
@@ -1826,13 +1970,13 @@ Unix Epoch time describes a point in time that has elapsed since January 1, 1970
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid role reference: The Principal element includes the IAM role ID. We recommend that you use a role ARN instead.
+Invalid role reference: The Principal element includes the IAM role ID {{roleid}}. We recommend that you use a role ARN instead.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The Principal element includes the IAM role ID. We recommend that you use a role ARN instead."
+"findingDetails": "The Principal element includes the IAM role ID {{roleid}}. We recommend that you use a role ARN instead."
 ```
 
 **Resolving the general warning**
@@ -1847,13 +1991,13 @@ AWS recommends that you specify the Amazon Resource Name \(ARN\) for an IAM role
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Invalid user reference: The Principal element includes the IAM user ID. We recommend that you use a user ARN instead.
+Invalid user reference: The Principal element includes the IAM user ID {{userid}}. We recommend that you use a user ARN instead.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The Principal element includes the IAM user ID. We recommend that you use a user ARN instead."
+"findingDetails": "The Principal element includes the IAM user ID {{userid}}. We recommend that you use a user ARN instead."
 ```
 
 **Resolving the general warning**
@@ -1939,13 +2083,13 @@ The following AWS managed policies include wildcards in their condition value wi
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Policy size exceeds identity policy quota: The characters in the identity policy, excluding whitespace, exceed the character maximum for inline and managed policies. We recommend that you use multiple granular policies.
+Policy size exceeds identity policy quota: The {{policySize}} characters in the identity policy, excluding whitespace, exceed the {{policySizeQuota}} character maximum for inline and managed policies. We recommend that you use multiple granular policies.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The characters in the identity policy, excluding whitespace, exceed the character maximum for inline and managed policies. We recommend that you use multiple granular policies."
+"findingDetails": "The {{policySize}} characters in the identity policy, excluding whitespace, exceed the {{policySizeQuota}} character maximum for inline and managed policies. We recommend that you use multiple granular policies."
 ```
 
 **Resolving the general warning**
@@ -1976,13 +2120,13 @@ The following AWS managed policies grant permissions to actions across many AWS 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Policy size exceeds resource policy quota: The characters in the resource policy exceed the character maximum for resource policies. We recommend that you use multiple granular policies.
+Policy size exceeds resource policy quota: The {{policySize}} characters in the resource policy exceed the {{policySizeQuota}} character maximum for resource policies. We recommend that you use multiple granular policies.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The characters in the resource policy exceed the character maximum for resource policies. We recommend that you use multiple granular policies."
+"findingDetails": "The {{policySize}} characters in the resource policy exceed the {{policySizeQuota}} character maximum for resource policies. We recommend that you use multiple granular policies."
 ```
 
 **Resolving the general warning**
@@ -2003,13 +2147,13 @@ If your policy is larger than the quota, you can organize your policy into multi
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Type mismatch: Use the operator type instead of operator for the condition key.
+Type mismatch: Use the operator type {{allowed}} instead of operator {{operator}} for the condition key {{key}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Use the operator type instead of operator for the condition key."
+"findingDetails": "Use the operator type {{allowed}} instead of operator {{operator}} for the condition key {{key}}."
 ```
 
 **Resolving the general warning**
@@ -2027,13 +2171,13 @@ For example, the `aws:MultiFactorAuthPresent` global condition key requires a co
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Type mismatch Boolean: Add a valid Boolean value (true or false) for the condition operator.
+Type mismatch Boolean: Add a valid Boolean value (true or false) for the condition operator {{operator}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Add a valid Boolean value (true or false) for the condition operator."
+"findingDetails": "Add a valid Boolean value (true or false) for the condition operator {{operator}}."
 ```
 
 **Resolving the general warning**
@@ -2073,13 +2217,13 @@ Update the text to use the date condition operator data type, in a `YYYY-MM-DD` 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Type mismatch IP range: The condition operator is used with an invalid IP range value. Specify the IP range in standard CIDR format.
+Type mismatch IP range: The condition operator {{operator}} is used with an invalid IP range value. Specify the IP range in standard CIDR format.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The condition operator is used with an invalid IP range value. Specify the IP range in standard CIDR format."
+"findingDetails": "The condition operator {{operator}} is used with an invalid IP range value. Specify the IP range in standard CIDR format."
 ```
 
 **Resolving the general warning**
@@ -2095,13 +2239,13 @@ Update the text to use the IP address condition operator data type, in a CIDR fo
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Type mismatch number: Add a valid numeric value for the condition operator.
+Type mismatch number: Add a valid numeric value for the condition operator {{operator}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Add a valid numeric value for the condition operator."
+"findingDetails": "Add a valid numeric value for the condition operator {{operator}}."
 ```
 
 **Resolving the general warning**
@@ -2117,13 +2261,13 @@ Update the text to use the numeric condition operator data type\.
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Type mismatch string: Add a valid base64-encoded string value for the condition operator.
+Type mismatch string: Add a valid base64-encoded string value for the condition operator {{operator}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Add a valid base64-encoded string value for the condition operator."
+"findingDetails": "Add a valid base64-encoded string value for the condition operator {{operator}}."
 ```
 
 **Resolving the general warning**
@@ -2133,6 +2277,48 @@ Update the text to use the string condition operator data type\.
 **Related terms**
 + [String condition operators](reference_policies_elements_condition_operators.md#Conditions_String)
 + [IAM JSON policy elements: Condition operators](reference_policies_elements_condition_operators.md)
+
+## General Warning – Specific github repo and branch recommended<a name="access-analyzer-reference-policy-checks-general-warning-specific-github-repo-and-branch-recommended"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Specific github repo and branch recommended: Using a wildcard (*) in token.actions.githubusercontent.com:sub can allow requests from more sources than you intended. Specify the value of token.actions.githubusercontent.com:sub with the repository and branch name.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "Using a wildcard (*) in token.actions.githubusercontent.com:sub can allow requests from more sources than you intended. Specify the value of token.actions.githubusercontent.com:sub with the repository and branch name."
+```
+
+**Resolving the general warning**
+
+If you use GitHub as an OIDC IdP, best practice is to limit the entities that can assume the role associated with the IAM IdP\. When you include a `Condition` statement in a role trust policy, you can limit the role to a specific GitHub organization, repository, or branch\. You can use the condition key `token.actions.githubusercontent.com:sub` to limit access\. We recommend that you limit the condition to a specific set of repositories or branches\. If you use a wildcard \(`*`\) in `token.actions.githubusercontent.com:sub`, then GitHub Actions from organizations or repositories outside of your control are able to assume roles associated with the GitHub IAM IdP in your AWS account\.
+
+**Related terms**
++ [Configuring a role for GitHub OIDC identity provider](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html#idp_oidc_Create_GitHub)
+
+## General Warning – Policy size exceeds role trust policy quota<a name="access-analyzer-reference-policy-checks-general-warning-policy-size-exceeds-role-trust-policy-quota"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Policy size exceeds role trust policy quota: The characters in the role trust policy, excluding whitespace, exceed the character maximum. We recommend that you request a role trust policy length quota increase using Service Quotas and AWS Support Center. If the quotas have already been increased, then you can ignore this warning.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "The characters in the role trust policy, excluding whitespace, exceed the character maximum. We recommend that you request a role trust policy length quota increase using Service Quotas and AWS Support Center. If the quotas have already been increased, then you can ignore this warning."
+```
+
+**Resolving the general warning**
+
+IAM and AWS STS have quotas that limit the size of role trust policies\. The characters in the role trust policy, excluding whitespace, exceed the character maximum\. We recommend that you request a role trust policy length quota increase using Service Quotas and the AWS Support Center Console\.
+
+**Related terms**
++ [IAM and AWS STS quotas, name requirements, and character limits](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html)
 
 ## Security Warning – Allow with NotPrincipal<a name="access-analyzer-reference-policy-checks-security-warning-allow-with-not-principal"></a>
 
@@ -2159,13 +2345,13 @@ Using `"Effect": "Allow"` with the `NotPrincipal` can be overly permissive\. For
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-ForAllValues with single valued key: Using ForAllValues qualifier with the single-valued condition key can be overly permissive. We recommend that you remove ForAllValues:.
+ForAllValues with single valued key: Using ForAllValues qualifier with the single-valued condition key {{key}} can be overly permissive. We recommend that you remove ForAllValues:.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Using ForAllValues qualifier with the single-valued condition key can be overly permissive. We recommend that you remove ForAllValues:."
+"findingDetails": "Using ForAllValues qualifier with the single-valued condition key {{key}} can be overly permissive. We recommend that you remove ForAllValues:."
 ```
 
 **Resolving the security warning**
@@ -2351,13 +2537,13 @@ To configure many AWS services, you must pass an IAM role to the service\. To al
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Missing paired condition keys: Using the condition key can be overly permissive without also using the following condition keys:. Condition keys like this one are more secure when paired with a related key. We recommend that you add the related condition keys to the same condition block.
+Missing paired condition keys: Using the condition key {{conditionKeyName}} can be overly permissive without also using the following condition keys: {{recommendedKeys}}. Condition keys like this one are more secure when paired with a related key. We recommend that you add the related condition keys to the same condition block.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Using the condition key can be overly permissive without also using the following condition keys:. Condition keys like this one are more secure when paired with a related key. We recommend that you add the related condition keys to the same condition block."
+"findingDetails": "Using the condition key {{conditionKeyName}} can be overly permissive without also using the following condition keys: {{recommendedKeys}}. Condition keys like this one are more secure when paired with a related key. We recommend that you add the related condition keys to the same condition block."
 ```
 
 **Resolving the security warning**
@@ -2378,13 +2564,13 @@ For example, you can use the `aws:VpcSourceIp` condition key to compare the IP a
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Deny with unsupported tag condition key for service: Using the effect Deny with the tag condition key and actions for services with the following prefixes can be overly permissive:. Actions for the listed services are not denied by this statement. We recommend that you move these actions to a different statement without this condition key.
+Deny with unsupported tag condition key for service: Using the effect Deny with the tag condition key {{conditionKeyName}} and actions for services with the following prefixes can be overly permissive: {{serviceNames}}. Actions for the listed services are not denied by this statement. We recommend that you move these actions to a different statement without this condition key.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Using the effect Deny with the tag condition key and actions for services with the following prefixes can be overly permissive:. Actions for the listed services are not denied by this statement. We recommend that you move these actions to a different statement without this condition key."
+"findingDetails": "Using the effect Deny with the tag condition key {{conditionKeyName}} and actions for services with the following prefixes can be overly permissive: {{serviceNames}}. Actions for the listed services are not denied by this statement. We recommend that you move these actions to a different statement without this condition key."
 ```
 
 **Resolving the security warning**
@@ -2443,13 +2629,13 @@ Do not use the …[IfExists](reference_policies_elements_condition_operators.md#
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Deny NotAction with unsupported tag condition key for service: Using the effect Deny with NotAction and the tag condition key can be overly permissive because some service actions are not denied by this statement. This is because the condition key doesn't apply to some service actions. We recommend that you use Action instead of NotAction.
+Deny NotAction with unsupported tag condition key for service: Using the effect Deny with NotAction and the tag condition key {{conditionKeyName}} can be overly permissive because some service actions are not denied by this statement. This is because the condition key doesn't apply to some service actions. We recommend that you use Action instead of NotAction.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Using the effect Deny with NotAction and the tag condition key can be overly permissive because some service actions are not denied by this statement. This is because the condition key doesn't apply to some service actions. We recommend that you use Action instead of NotAction."
+"findingDetails": "Using the effect Deny with NotAction and the tag condition key {{conditionKeyName}} can be overly permissive because some service actions are not denied by this statement. This is because the condition key doesn't apply to some service actions. We recommend that you use Action instead of NotAction."
 ```
 
 **Resolving the security warning**
@@ -2491,6 +2677,48 @@ You can specify AWS services in the `Principal` element of a resource\-based pol
 + [AWS global condition keys: aws:SourceArn](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-sourcearn)
 + [The confused deputy problem](https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html#cross-service-confused-deputy-prevention)
 
+## Security Warning – Missing condition key for oidc principal<a name="access-analyzer-reference-policy-checks-security-warning-missing-condition-key-for-oidc-principal"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Missing condition key for oidc principal: Using an Open ID Connect principal without a condition can be overly permissive. Add condition keys with a prefix that matches your federated OIDC principals to ensure that only the intended identity provider assumes the role.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "Using an Open ID Connect principal without a condition can be overly permissive. Add condition keys with a prefix that matches your federated OIDC principals to ensure that only the intended identity provider assumes the role."
+```
+
+**Resolving the security warning**
+
+Using an Open ID Connect principal without a condition can be overly permissive\. Add condition keys with a prefix that matches your federated OIDC principals to ensure that only the intended identity provider assumes the role\.
+
+**Related terms**
++ [Creating a role for web identity or OpenID Connect Federation \(console\)](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html)
+
+## Security Warning – Missing github repo condition key<a name="access-analyzer-reference-policy-checks-security-warning-missing-github-repo-condition-key"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Missing github repo condition key: Granting a federated GitHub principal permissions without a condition key can allow more sources to assume the role than you intended. Add the token.actions.githubusercontent.com:sub condition key and specify the branch and repository name in the value.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "Granting a federated GitHub principal permissions without a condition key can allow more sources to assume the role than you intended. Add the token.actions.githubusercontent.com:sub condition key and specify the branch and repository name in the value."
+```
+
+**Resolving the security warning**
+
+If you use GitHub as an OIDC IdP, best practice is to limit the entities that can assume the role associated with the IAM IdP\. When you include a `Condition` statement in a role trust policy, you can limit the role to a specific GitHub organization, repository, or branch\. You can use the condition key `token.actions.githubusercontent.com:sub` to limit access\. We recommend that you limit the condition to a specific set of repositories or branches\. If you do not include this condition, then GitHub Actions from organizations or repositories outside of your control are able to assume roles associated with the GitHub IAM IdP in your AWS account\.
+
+**Related terms**
++ [Configuring a role for GitHub OIDC identity provider](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html#idp_oidc_Create_GitHub)
+
 ## Suggestion – Empty array action<a name="access-analyzer-reference-policy-checks-suggestion-empty-array-action"></a>
 
 In the AWS Management Console, the finding for this check includes the following message:
@@ -2515,13 +2743,13 @@ Statements must include either an `Action` or `NotAction` element that includes 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Empty array condition: There are no values for the condition key and it does not affect the policy. Specify conditions.
+Empty array condition: There are no values for the condition key {{key}} and it does not affect the policy. Specify conditions.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "There are no values for the condition key and it does not affect the policy. Specify conditions."
+"findingDetails": "There are no values for the condition key {{key}} and it does not affect the policy. Specify conditions."
 ```
 
 **Resolving the suggestion**
@@ -2534,13 +2762,13 @@ The optional `Condition` element structure requires that you use a condition ope
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Empty array condition ForAllValues: The ForAllValues prefix with an empty condition key matches only if the key is missing from the request context. To determine if the request context is empty, we recommend that you use the Null condition operator with the value of true instead.
+Empty array condition ForAllValues: The ForAllValues prefix with an empty condition key matches only if the key {{key}} is missing from the request context. To determine if the request context is empty, we recommend that you use the Null condition operator with the value of true instead.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The ForAllValues prefix with an empty condition key matches only if the key is missing from the request context. To determine if the request context is empty, we recommend that you use the Null condition operator with the value of true instead."
+"findingDetails": "The ForAllValues prefix with an empty condition key matches only if the key {{key}} is missing from the request context. To determine if the request context is empty, we recommend that you use the Null condition operator with the value of true instead."
 ```
 
 **Resolving the suggestion**
@@ -2557,13 +2785,13 @@ When you use `ForAllValues` with an empty condition key, the condition matches o
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Empty array condition ForAnyValue: The ForAnyValue prefix with an empty condition key never matches the request context and it does not affect the policy. Specify conditions.
+Empty array condition ForAnyValue: The ForAnyValue prefix with an empty condition key {{key}} never matches the request context and it does not affect the policy. Specify conditions.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The ForAnyValue prefix with an empty condition key never matches the request context and it does not affect the policy. Specify conditions."
+"findingDetails": "The ForAnyValue prefix with an empty condition key {{key}} never matches the request context and it does not affect the policy. Specify conditions."
 ```
 
 **Resolving the suggestion**
@@ -2579,13 +2807,13 @@ When you use `ForAnyValues` with an empty condition key, the condition never mat
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Empty array condition IfExists: The IfExists suffix with an empty condition key matches only if the key is missing from the request context. To determine if the request context is empty, we recommend that you use the Null condition operator with the value of true instead.
+Empty array condition IfExists: The IfExists suffix with an empty condition key matches only if the key {{key}} is missing from the request context. To determine if the request context is empty, we recommend that you use the Null condition operator with the value of true instead.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The IfExists suffix with an empty condition key matches only if the key is missing from the request context. To determine if the request context is empty, we recommend that you use the Null condition operator with the value of true instead."
+"findingDetails": "The IfExists suffix with an empty condition key matches only if the key {{key}} is missing from the request context. To determine if the request context is empty, we recommend that you use the Null condition operator with the value of true instead."
 ```
 
 **Resolving the suggestion**
@@ -2709,13 +2937,13 @@ The optional `Sid` \(statement ID\) element allows you to enter an identifier th
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Improve IP range: The non-zero bits in the IP address after the masked bits are ignored. Replace address with.
+Improve IP range: The non-zero bits in the IP address after the masked bits are ignored. Replace address with {{addr}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The non-zero bits in the IP address after the masked bits are ignored. Replace address with."
+"findingDetails": "The non-zero bits in the IP address after the masked bits are ignored. Replace address with {{addr}}."
 ```
 
 **Resolving the suggestion**
@@ -2805,13 +3033,13 @@ When your `Condition` element includes the `NotIpAddress` condition operator and
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Redundant action: The action(s) are redundant because they provide similar permissions. Update the policy to remove the redundant action such as:.
+Redundant action: The {{redundantActionCount}} action(s) are redundant because they provide similar permissions. Update the policy to remove the redundant action such as: {{redundantAction}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The action(s) are redundant because they provide similar permissions. Update the policy to remove the redundant action such as:."
+"findingDetails": "The {{redundantActionCount}} action(s) are redundant because they provide similar permissions. Update the policy to remove the redundant action such as: {{redundantAction}}."
 ```
 
 **Resolving the suggestion**
@@ -2821,7 +3049,7 @@ When you use wildcards \(\*\) in the `Action` element, you can include redundant
 For example, the following actions include the `iam:GetCredentialReport` action twice\.
 
 ```
-    "Action": [
+"Action": [
         "iam:Get*",
         "iam:List*",
         "iam:GetCredentialReport"
@@ -2844,13 +3072,13 @@ Redundant actions do not affect the permissions granted by the policy\. When usi
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Redundant condition value num: Multiple values in are redundant. Replace with the greatest/least single value for.
+Redundant condition value num: Multiple values in {{operator}} are redundant. Replace with the {{greatest/least}} single value for {{key}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Multiple values in are redundant. Replace with the greatest/least single value for."
+"findingDetails": "Multiple values in {{operator}} are redundant. Replace with the {{greatest/least}} single value for {{key}}."
 ```
 
 **Resolving the suggestion**
@@ -2860,7 +3088,7 @@ When you use numeric condition operators for similar values in a condition key, 
 For example, the following `Condition` element includes multiple `aws:MultiFactorAuthAge` conditions that have an age overlap of 1200 seconds\.
 
 ```
-      "Condition": {
+"Condition": {
         "NumericLessThan": {
           "aws:MultiFactorAuthAge": [
             "2700",
@@ -2879,13 +3107,13 @@ In this example, the permissions are defined if multi\-factor authentication \(M
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Redundant resource: The resource ARN(s) are redundant because they reference the same resource. Review the use of wildcards (*)
+Redundant resource: The {{redundantResourceCount}} resource ARN(s) are redundant because they reference the same resource. Review the use of wildcards (*)
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "The resource ARN(s) are redundant because they reference the same resource. Review the use of wildcards (*)"
+"findingDetails": "The {{redundantResourceCount}} resource ARN(s) are redundant because they reference the same resource. Review the use of wildcards (*)"
 ```
 
 **Resolving the suggestion**
@@ -2895,7 +3123,7 @@ When you use wildcards \(\*\) in Amazon Resource Names \(ARNs\), you can create 
 For example, the following `Resource` element includes multiple ARNs with redundant permissions\.
 
 ```
-        "Resource": [
+"Resource": [
             "arn:aws:iam::111122223333:role/jane-admin",
             "arn:aws:iam::111122223333:role/jane-s3only",
             "arn:aws:iam::111122223333:role/jane*"
@@ -2951,7 +3179,7 @@ In programmatic calls to the AWS CLI or AWS API, the finding for this check incl
 When you include the name of an AWS service in a policy, AWS recommends that you do not include wildcards \(\*, ?\)\. This might add permissions for future services that you do not intend\. For example, there are more than a dozen AWS services with the word `*code*` in their name\.
 
 ```
-      "Resource": "arn:aws:*code*::111122223333:*"
+"Resource": "arn:aws:*code*::111122223333:*"
 ```
 + [IAM JSON policy elements: Resource](reference_policies_elements_resource.md)
 
@@ -2960,13 +3188,13 @@ When you include the name of an AWS service in a policy, AWS recommends that you
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Allow with unsupported tag condition key for service: Using the effect Allow with the tag condition key and actions for services with the following prefixes does not affect the policy:. Actions for the listed service are not allowed by this statement. We recommend that you move these actions to a different statement without this condition key.
+Allow with unsupported tag condition key for service: Using the effect Allow with the tag condition key {{conditionKeyName}} and actions for services with the following prefixes does not affect the policy: {{serviceNames}}. Actions for the listed service are not allowed by this statement. We recommend that you move these actions to a different statement without this condition key.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Using the effect Allow with the tag condition key and actions for services with the following prefixes does not affect the policy:. Actions for the listed service are not allowed by this statement. We recommend that you move these actions to a different statement without this condition key."
+"findingDetails": "Using the effect Allow with the tag condition key {{conditionKeyName}} and actions for services with the following prefixes does not affect the policy: {{serviceNames}}. Actions for the listed service are not allowed by this statement. We recommend that you move these actions to a different statement without this condition key."
 ```
 
 **Resolving the suggestion**
@@ -3025,13 +3253,13 @@ Do not use the …[IfExists](reference_policies_elements_condition_operators.md#
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Allow NotAction with unsupported tag condition key for service: Using the effect Allow with NotAction and the tag condition key allows only service actions that support the condition key. The condition key doesn't apply to some service actions. We recommend that you use Action instead of NotAction.
+Allow NotAction with unsupported tag condition key for service: Using the effect Allow with NotAction and the tag condition key {{conditionKeyName}} allows only service actions that support the condition key. The condition key doesn't apply to some service actions. We recommend that you use Action instead of NotAction.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "Using the effect Allow with NotAction and the tag condition key allows only service actions that support the condition key. The condition key doesn't apply to some service actions. We recommend that you use Action instead of NotAction."
+"findingDetails": "Using the effect Allow with NotAction and the tag condition key {{conditionKeyName}} allows only service actions that support the condition key. The condition key doesn't apply to some service actions. We recommend that you use Action instead of NotAction."
 ```
 
 **Resolving the suggestion**
@@ -3049,41 +3277,18 @@ When a service supports the `aws:ResourceTag` condition key, you can use tags to
 + [Condition element](reference_policies_elements_condition.md)
 + [Overview of JSON policies](access_policies.md#access_policies-json)
 
-## Suggestion – Irrelevant condition key in policy<a name="access-analyzer-reference-policy-checks-suggestion-irrelevant-condition-key-in-policy"></a>
-
-In the AWS Management Console, the finding for this check includes the following message:
-
-```
-Irrelevant condition key in policy: The condition key is not relevant for the policy. Use this key in an identity-based policy to govern access to this resource.
-```
-
-In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
-
-```
-"findingDetails": "The condition key is not relevant for the policy. Use this key in an identity-based policy to govern access to this resource."
-```
-
-**Resolving the suggestion**
-
-Some condition keys aren't relevant for resource\-based policies\. For example, the `s3:ResourceAccount` condition key isn't relevant for the resource\-based policy attached to an Amazon S3 bucket or Amazon S3 access point resource type\.
-
-You should use the condition key in an identity\-based policy to control access to the resource\.
-
-**Related terms**
-+ [Identity\-based policies and resource\-based policies](access_policies_identity-vs-resource.md)
-
 ## Suggestion – Recommended condition key for service principal<a name="access-analyzer-reference-policy-checks-suggestion-recommended-condition-key-for-service-principal"></a>
 
 In the AWS Management Console, the finding for this check includes the following message:
 
 ```
-Recommended condition key for service principal: To restrict access to the service principal operating on your behalf, we recommend aws:SourceArn or aws:SourceAccount instead of.
+Recommended condition key for service principal: To restrict access to the service principal {{servicePrincipalPrefix}} operating on your behalf, we recommend aws:SourceArn or aws:SourceAccount instead of {{key}}.
 ```
 
 In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
 
 ```
-"findingDetails": "To restrict access to the service principal operating on your behalf, we recommend aws:SourceArn or aws:SourceAccount instead of."
+"findingDetails": "To restrict access to the service principal {{servicePrincipalPrefix}} operating on your behalf, we recommend aws:SourceArn or aws:SourceAccount instead of {{key}}."
 ```
 
 **Resolving the suggestion**
@@ -3095,3 +3300,80 @@ You can specify AWS services in the `Principal` element of a resource\-based pol
 + [AWS global condition keys: aws:SourceAccount](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-sourceaccount)
 + [AWS global condition keys: aws:SourceArn](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-sourcearn)
 + [The confused deputy problem](https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html#cross-service-confused-deputy-prevention)
+
+## Suggestion – Irrelevant condition key in policy<a name="access-analyzer-reference-policy-checks-suggestion-irrelevant-condition-key-in-policy"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Irrelevant condition key in policy: The condition key {{condition-key}} is not relevant for the {{resource-type}} policy.  Use this key in an identity-based policy to govern access to this resource.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "The condition key {{condition-key}} is not relevant for the {{resource-type}} policy.  Use this key in an identity-based policy to govern access to this resource."
+```
+
+**Resolving the suggestion**
+
+Some condition keys aren't relevant for resource\-based policies\. For example, the `s3:ResourceAccount` condition key isn't relevant for the resource\-based policy attached to an Amazon S3 bucket or Amazon S3 access point resource type\.
+
+You should use the condition key in an identity\-based policy to control access to the resource\.
+
+**Related terms**
++ [Identity\-based policies and resource\-based policies](access_policies_identity-vs-resource.md)
+
+## Suggestion – Redundant principal in role trust policy<a name="access-analyzer-reference-policy-checks-suggestion-redundant-principal-in-role-trust-policy"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Redundant principal in role trust policy: The assumed-role principal {{redundant_principal}} is redundant with its parent role {{parent_role}}. Remove the assumed-role principal.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "The assumed-role principal {{redundant_principal}} is redundant with its parent role {{parent_role}}. Remove the assumed-role principal."
+```
+
+**Resolving the suggestion**
+
+If you specify both an assumed\-role principal and its parent role in the `Principal` element of a policy, it does not allow or deny any different permissions\. For example, it is redundant if you specify the `Principal` element using the following format:
+
+```
+"Principal": {
+            "AWS": [
+            "arn:aws:iam::AWS-account-ID:role/rolename",
+            "arn:aws:iam::AWS-account-ID:assumed-role/rolename/rolesessionname"
+        ]
+```
+
+We recommend removing the assumed\-role principal\.
+
+**Related terms**
++ [Role session principals](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html#principal-role-session)
+
+## Suggestion – Confirm audience claim type<a name="access-analyzer-reference-policy-checks-suggestion-confirm-audience-claim-type"></a>
+
+In the AWS Management Console, the finding for this check includes the following message:
+
+```
+Confirm audience claim type: The 'aud' (audience) claim key identifies the recipients that the JSON web token is intended for. Audience claims can be multivalued or single-valued. If the claim is multivalued, use a ForAllValues or ForAnyValue qualifier. If the claim is single-valued, do not use a qualifier.
+```
+
+In programmatic calls to the AWS CLI or AWS API, the finding for this check includes the following message:
+
+```
+"findingDetails": "The 'aud' (audience) claim key identifies the recipients that the JSON web token is intended for. Audience claims can be multivalued or single-valued. If the claim is multivalued, use a ForAllValues or ForAnyValue qualifier. If the claim is single-valued, do not use a qualifier."
+```
+
+**Resolving the suggestion**
+
+The `aud` \(audience\) claim key is a unique identifier for your app that is issued to you when you register your app with the IdP and identifies the recipients that the JSON web token is intended for\. Audience claims can be multivalued or single\-valued\. If the claim is multivalued, use a `ForAllValues` or `ForAnyValue` condition set operator\. If the claim is single\-valued, do not use a condition set operator\.
+
+**Related terms**
++ [Creating a role for web identity or OpenID Connect Federation \(console\)](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html)
++ [Using multiple keys and values](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_multi-value-conditions.html#reference_policies_multi-key-or-value-conditions)
++ [Single\-valued vs\. multivalued condition keys](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_single-vs-multi-valued-condition-keys.html)

@@ -21,7 +21,7 @@ You can use AWS Security Token Service \(AWS STS\) to create and provide trusted
 
 If you want to run AWS CLI commands or code inside an EC2 instance, the recommended way to get credentials is to use [roles for Amazon EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html)\. You create an IAM role that specifies the permissions that you want to grant to applications that run on the EC2 instances\. When you launch the instance, you associate the role with the instance\.
 
-Applications, AWS CLI, and Tools for Windows PowerShell commands that run on the instance can then get automatic temporary security credentials from the instance metadata\. You do not have to explicitly get the temporary security credentials\. The AWS SDKs, AWS CLI, and Tools for Windows PowerShell automatically get the credentials from the EC2 instance metadata service and use them\. The temporary credentials have the permissions that you define for the role that is associated with the instance\.
+Applications, AWS CLI, and Tools for Windows PowerShell commands that run on the instance can then get automatic temporary security credentials from the instance metadata\. You do not have to explicitly get the temporary security credentials\. The AWS SDKs, AWS CLI, and Tools for Windows PowerShell automatically get the credentials from the EC2 Instance Metadata Service \(IMDS\) and use them\. The temporary credentials have the permissions that you define for the role that is associated with the instance\.
 
 For more information and for examples, see the following:
 +  [Using IAM Roles to Grant Access to AWS Resources on Amazon Elastic Compute Cloud](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/java-dg-roles.html) — AWS SDK for Java
@@ -88,7 +88,7 @@ If you're making direct HTTPS API requests to AWS, you can sign those requests w
 ## More information<a name="using-temp-creds-more-info"></a>
 
 For more information about using AWS STS with other AWS services, see the following links:
-+ **Amazon S3**\. See [Making Requests Using IAM User Temporary Credentials](https://docs.aws.amazon.com/AmazonS3/latest/dev/AuthUsingTempSessionToken.html) or [Making Requests Using Federated User Temporary Credentials](https://docs.aws.amazon.com/AmazonS3/latest/dev/AuthUsingTempFederationToken.html) in the *Amazon Simple Storage Service User Guide *\.
++ **Amazon S3**\. See [Making requests using IAM user temporary credentials](https://docs.aws.amazon.com/AmazonS3/latest/dev/AuthUsingTempSessionToken.html) or [Making requests using federated user temporary credentials](https://docs.aws.amazon.com/AmazonS3/latest/dev/AuthUsingTempFederationToken.html) in the *Amazon Simple Storage Service User Guide *\.
 + **Amazon SNS**\. See [Using Temporary Security Credentials](https://docs.aws.amazon.com/sns/latest/dg/UsingIAMwithSNS.html#UsingTemporarySecurityCredentials_SNS) in the *Amazon Simple Notification Service Developer Guide*\.
-+ **Amazon SQS**\. See [Using Temporary Security Credentials](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/UsingIAM.html#UsingTemporarySecurityCredentials_SQS) in the *Amazon Simple Queue Service Developer Guide*\.
-+ **Amazon SimpleDB**\. See [Using Temporary Security Credentials](https://docs.aws.amazon.com/AmazonSimpleDB/latest/DeveloperGuide/index.html?UsingTemporarySecurityCredentials_SDB.html) in the *Amazon SimpleDB Developer Guide*\.
++ **Amazon SQS**\. See [Using identity\-based policies with Amazon SNS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/UsingIAM.html#UsingTemporarySecurityCredentials_SQS) in the *Amazon Simple Queue Service Developer Guide*\.
++ **Amazon SimpleDB**\. See [Identity and access management in Amazon SQS](https://docs.aws.amazon.com/AmazonSimpleDB/latest/DeveloperGuide/index.html?UsingTemporarySecurityCredentials_SDB.html) in the *Amazon SimpleDB Developer Guide*\.

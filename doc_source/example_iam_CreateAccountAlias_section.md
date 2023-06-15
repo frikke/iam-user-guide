@@ -6,80 +6,40 @@ The following code examples show how to create an alias for an IAM account\.
 The source code for these examples is in the [AWS Code Examples GitHub repository](https://github.com/awsdocs/aws-doc-sdk-examples)\. Have feedback on a code example? [Create an Issue](https://github.com/awsdocs/aws-doc-sdk-examples/issues/new/choose) in the code examples repo\. 
 
 ------
-#### [ Go ]
+#### [ C\+\+ ]
 
-**SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+**SDK for C\+\+**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/cpp/example_code/iam#code-examples)\. 
   
 
 ```
-package main
+bool AwsDoc::IAM::createAccountAlias(const Aws::String &aliasName,
+                                     const Aws::Client::ClientConfiguration &clientConfig) {
+    Aws::IAM::IAMClient iam(clientConfig);
+    Aws::IAM::Model::CreateAccountAliasRequest request;
+    request.SetAccountAlias(aliasName);
 
-import (
-	"context"
-	"flag"
-	"fmt"
+    Aws::IAM::Model::CreateAccountAliasOutcome outcome = iam.CreateAccountAlias(
+            request);
+    if (!outcome.IsSuccess()) {
+        std::cerr << "Error creating account alias " << aliasName << ": "
+                  << outcome.GetError().GetMessage() << std::endl;
+    }
+    else {
+        std::cout << "Successfully created account alias " << aliasName <<
+                  std::endl;
+    }
 
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/iam"
-)
-
-// IAMCreateAccountAliasAPI defines the interface for the CreateAccountAlias function.
-// We use this interface to test the function using a mocked service.
-type IAMCreateAccountAliasAPI interface {
-	CreateAccountAlias(ctx context.Context,
-		params *iam.CreateAccountAliasInput,
-		optFns ...func(*iam.Options)) (*iam.CreateAccountAliasOutput, error)
-}
-
-// MakeAccountAlias creates an alias for your AWS Identity and Access Management (IAM) account.
-// Inputs:
-//     c is the context of the method call, which includes the AWS Region.
-//     api is the interface that defines the method call.
-//     input defines the input arguments to the service call.
-// Output:
-//     If successful, a CreateAccountAliasOutput object containing the result of the service call and nil.
-//     Otherwise, nil and an error from the call to CreateAccountAlias.
-func MakeAccountAlias(c context.Context, api IAMCreateAccountAliasAPI, input *iam.CreateAccountAliasInput) (*iam.CreateAccountAliasOutput, error) {
-	return api.CreateAccountAlias(c, input)
-}
-
-func main() {
-	alias := flag.String("a", "", "The account alias")
-	flag.Parse()
-
-	if *alias == "" {
-		fmt.Println("You must supply an account alias (-a ALIAS)")
-	}
-
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		panic("configuration error, " + err.Error())
-	}
-
-	client := iam.NewFromConfig(cfg)
-
-	input := &iam.CreateAccountAliasInput{
-		AccountAlias: alias,
-	}
-
-	_, err = MakeAccountAlias(context.TODO(), client, input)
-	if err != nil {
-		fmt.Println("Got an error creating an account alias")
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Printf("Created account alias " + *alias)
+    return outcome.IsSuccess();
 }
 ```
-+  For API details, see [CreateAccountAlias](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.CreateAccountAlias) in *AWS SDK for Go API Reference*\. 
++  For API details, see [CreateAccountAlias](https://docs.aws.amazon.com/goto/SdkForCpp/iam-2010-05-08/CreateAccountAlias) in *AWS SDK for C\+\+ API Reference*\. 
 
 ------
 #### [ Java ]
 
 **SDK for Java 2\.x**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javav2/example_code/iam#readme)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javav2/example_code/iam#readme)\. 
   
 
 ```
@@ -104,44 +64,33 @@ func main() {
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 Create the account alias\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { CreateAccountAliasCommand } from "@aws-sdk/client-iam";
+import { CreateAccountAliasCommand, IAMClient } from "@aws-sdk/client-iam";
 
-// Set the parameters.
-export const params = { AccountAlias: "ACCOUNT_ALIAS" }; //ACCOUNT_ALIAS
+const client = new IAMClient({});
 
-export const run = async () => {
-  try {
-    const data = await iamClient.send(new CreateAccountAliasCommand(params));
-    console.log("Success", data);
-    return data;
-  } catch (err) {
-    console.log("Error", err);
-  }
+/**
+ *
+ * @param {string} alias - A unique name for the account alias.
+ * @returns
+ */
+export const createAccountAlias = (alias) => {
+  const command = new CreateAccountAliasCommand({
+    AccountAlias: alias,
+  });
+
+  return client.send(command);
 };
-run();
 ```
 +  For more information, see [AWS SDK for JavaScript Developer Guide](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/iam-examples-account-aliases.html#iam-examples-account-aliases-creating)\. 
 +  For API details, see [CreateAccountAlias](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/createaccountaliascommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
-**SDK for JavaScript V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
+**SDK for JavaScript \(v2\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
   
 
 ```
@@ -169,7 +118,7 @@ iam.createAccountAlias({AccountAlias: process.argv[2]}, function(err, data) {
 
 **SDK for Kotlin**  
 This is prerelease documentation for a feature in preview release\. It is subject to change\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
   
 
 ```
@@ -191,7 +140,7 @@ suspend fun createIAMAccountAlias(alias: String) {
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```

@@ -1,86 +1,51 @@
 # Update an IAM user using an AWS SDK<a name="example_iam_UpdateUser_section"></a>
 
-The following code examples show how to update an IAM user\.
+The following code examples show how to update an IAM user\. 
+
+**Warning**  
+To avoid security risks, don't use IAM users for authentication when developing purpose\-built software or working with real data\. Instead, use federation with an identity provider such as [AWS IAM Identity Center \(successor to AWS Single Sign\-On\)](https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html)\.
 
 **Note**  
 The source code for these examples is in the [AWS Code Examples GitHub repository](https://github.com/awsdocs/aws-doc-sdk-examples)\. Have feedback on a code example? [Create an Issue](https://github.com/awsdocs/aws-doc-sdk-examples/issues/new/choose) in the code examples repo\. 
 
 ------
-#### [ Go ]
+#### [ C\+\+ ]
 
-**SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+**SDK for C\+\+**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/cpp/example_code/iam#code-examples)\. 
   
 
 ```
-package main
+bool AwsDoc::IAM::updateUser(const Aws::String &currentUserName,
+                             const Aws::String &newUserName,
+                             const Aws::Client::ClientConfiguration &clientConfig) {
+    Aws::IAM::IAMClient iam(clientConfig);
 
-import (
-	"context"
-	"flag"
-	"fmt"
+    Aws::IAM::Model::UpdateUserRequest request;
+    request.SetUserName(currentUserName);
+    request.SetNewUserName(newUserName);
 
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/iam"
-)
+    auto outcome = iam.UpdateUser(request);
+    if (outcome.IsSuccess()) {
+        std::cout << "IAM user " << currentUserName <<
+                  " successfully updated with new user name " << newUserName <<
+                  std::endl;
+    }
+    else {
+        std::cerr << "Error updating user name for IAM user " << currentUserName <<
+                  ":" << outcome.GetError().GetMessage() << std::endl;
+    }
 
-// IAMUpdateUserAPI defines the interface for the UpdateUser function.
-// We use this interface to test the function using a mocked service.
-type IAMUpdateUserAPI interface {
-	UpdateUser(ctx context.Context,
-		params *iam.UpdateUserInput,
-		optFns ...func(*iam.Options)) (*iam.UpdateUserOutput, error)
-}
-
-// RenameUser changes the name for an AWS Identity and Access Management (IAM) user.
-// Inputs:
-//     c is the context of the method call, which includes the AWS Region.
-//     api is the interface that defines the method call.
-//     input defines the input arguments to the service call.
-// Output:
-//     If successful, a UpdateUserOutput object containing the result of the service call and nil.
-//     Otherwise, nil and an error from the call to UpdateUser.
-func RenameUser(c context.Context, api IAMUpdateUserAPI, input *iam.UpdateUserInput) (*iam.UpdateUserOutput, error) {
-	return api.UpdateUser(c, input)
-}
-
-func main() {
-	userName := flag.String("u", "", "The name of the user")
-	newName := flag.String("n", "", "The new name of the user")
-	flag.Parse()
-
-	if *userName == "" || *newName == "" {
-		fmt.Println("You must supply a user name and new name (-u USERNAME -n NEW-NAME)")
-		return
-	}
-
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		panic("configuration error, " + err.Error())
-	}
-
-	client := iam.NewFromConfig(cfg)
-
-	input := &iam.UpdateUserInput{
-		UserName:    userName,
-		NewUserName: newName,
-	}
-
-	_, err = RenameUser(context.TODO(), client, input)
-	if err != nil {
-		fmt.Println("Got an error updating user " + *userName)
-	}
-
-	fmt.Println("Updated user name from: " + *userName + " to: " + *newName)
+    return outcome.IsSuccess();
 }
 ```
-+  For API details, see [UpdateUser](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.UpdateUser) in *AWS SDK for Go API Reference*\. 
++  For API details, see [UpdateUser](https://docs.aws.amazon.com/goto/SdkForCpp/iam-2010-05-08/UpdateUser) in *AWS SDK for C\+\+ API Reference*\. 
 
 ------
 #### [ Java ]
 
 **SDK for Java 2\.x**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javav2/example_code/iam#readme)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javav2/example_code/iam#readme)\. 
   
 
 ```
@@ -106,47 +71,34 @@ func main() {
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 Update the user\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { UpdateUserCommand } from "@aws-sdk/client-iam";
+import { UpdateUserCommand, IAMClient } from "@aws-sdk/client-iam";
 
-// Set the parameters.
-export const params = {
-  UserName: "ORIGINAL_USER_NAME", //ORIGINAL_USER_NAME
-  NewUserName: "NEW_USER_NAME", //NEW_USER_NAME
-};
+const client = new IAMClient({});
 
-export const run = async () => {
-  try {
-    const data = await iamClient.send(new UpdateUserCommand(params));
-    console.log("Success, username updated");
-    return data;
-  } catch (err) {
-    console.log("Error", err);
-  }
+/**
+ *
+ * @param {string} currentUserName
+ * @param {string} newUserName
+ */
+export const updateUser = (currentUserName, newUserName) => {
+  const command = new UpdateUserCommand({
+    UserName: currentUserName,
+    NewUserName: newUserName,
+  });
+
+  return client.send(command);
 };
-run();
 ```
 +  For more information, see [AWS SDK for JavaScript Developer Guide](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/iam-examples-managing-users.html#iam-examples-managing-users-updating-users)\. 
 +  For API details, see [UpdateUser](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/updateusercommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
-**SDK for JavaScript V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
+**SDK for JavaScript \(v2\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
   
 
 ```
@@ -171,7 +123,7 @@ iam.updateUser(params, function(err, data) {
   }
 });
 ```
-+  For more information, see [AWS SDK for JavaScript Developer Guide](https://docs.aws.amazon.com/sdk-for-javascript/23/developer-guide/iam-examples-managing-users.html#iam-examples-managing-users-updating-users)\. 
++  For more information, see [AWS SDK for JavaScript Developer Guide](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/iam-examples-managing-users.html#iam-examples-managing-users-updating-users)\. 
 +  For API details, see [UpdateUser](https://docs.aws.amazon.com/goto/AWSJavaScriptSDK/iam-2010-05-08/UpdateUser) in *AWS SDK for JavaScript API Reference*\. 
 
 ------
@@ -179,7 +131,7 @@ iam.updateUser(params, function(err, data) {
 
 **SDK for Kotlin**  
 This is prerelease documentation for a feature in preview release\. It is subject to change\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
   
 
 ```
@@ -202,7 +154,7 @@ suspend fun updateIAMUser(curName: String?, newName: String?) {
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```

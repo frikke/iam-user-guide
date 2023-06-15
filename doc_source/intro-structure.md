@@ -1,6 +1,14 @@
-# Understanding how IAM works<a name="intro-structure"></a>
+# How IAM works<a name="intro-structure"></a>
 
-Before you create users, you should understand how IAM works\. IAM provides the infrastructure necessary to control authentication and authorization for your account\. The IAM infrastructure includes the following elements:
+IAM provides the infrastructure necessary to control authentication and authorization for your AWS account\. The IAM infrastructure is illustrated by the following diagram:
+
+![\[IntroToIAM_Diagram\]](http://docs.aws.amazon.com/IAM/latest/UserGuide/images/intro-diagram _policies_800.png)
+
+First, a human user or an application uses their sign\-in credentials to authenticate with AWS\. Authentication is provided by matching the sign\-in credentials to a principal \(an IAM user, federated user, IAM role, or application\) trusted by the AWS account\. 
+
+Next, a request is made to grant the principal access to resources\. Access is granted in response to an authorization request\. For example, when you first sign in to the console and are on the console Home page, you are not accessing a specific service\. When you select a service, the request for authorization is sent to that service and it looks to see if your identity is on the list of authorized users, what policies are being enforced to control the level of access granted, and any other polices that might be in effect\. Authorization requests can be made by principals within your AWS account or from another AWS account that you trust\.
+
+Once authorized, the principal can take action or perform operations on resources in your AWS account\. For example, the principal could launch a new Amazon Elastic Compute Cloud instance, modify IAM group membership, or delete Amazon Simple Storage Service buckets\.
 
 **Topics**
 + [Terms](#intro-structure-terms)
@@ -11,11 +19,9 @@ Before you create users, you should understand how IAM works\. IAM provides the 
 + [Actions or operations](#intro-structure-actions)
 + [Resources](#intro-structure-resources)
 
-![\[IntroToIAM_Diagram\]](http://docs.aws.amazon.com/IAM/latest/UserGuide/images/intro-diagram _policies_800.png)
-
 ## Terms<a name="intro-structure-terms"></a>
 
-Learn more about IAM terms\.
+In the previous illustration we used specific terminology to describe how to obtain access to resources\. These IAM terms are commonly used when working with AWS:
 
 IAM Resources  
 The user, group, role, policy, and identity provider objects that are stored in IAM\. As with other AWS services, you can add, edit, and remove resources from IAM\.
@@ -29,9 +35,15 @@ The IAM resource objects that AWS uses for authentication\. These include IAM us
 Principals  
 A person or application that uses the AWS account root user, an IAM user, or an IAM role to sign in and make requests to AWS\. Principals include federated users and assumed roles\.
 
+Human users  
+Also known as *human identities*; the people, administrators, developers, operators, and consumers of your applications\.
+
+Workload  
+A collection of resources and code that delivers business value, such as an application or backend process\. Can include applications, operational tools, and components\.
+
 ## Principal<a name="intro-structure-principal"></a>
 
-A *principal* is a person or application that can make a request for an action or operation on an AWS resource\. The principal is authenticated as the AWS account root user or an IAM entity to make requests to AWS\. As a best practice, do not use your root user credentials for your daily work\. Instead, create IAM entities \(users and roles\)\. You can also support federated users or programmatic access to allow an application to access your AWS account\.
+A *principal* is a human user or workload that can make a request for an action or operation on an AWS resource\. After authentication, the principal can be granted either permanent or temporary credentials to make requests to AWS, depending on the principal type\. IAM users and root user are granted permanent credentials, while roles are granted temporary credentials\. As a [best practice](best-practices.md), we recommend that you require human users and workloads to access AWS resources using temporary credentials\.
 
 ## Request<a name="intro-structure-request"></a>
 
@@ -48,7 +60,7 @@ AWS gathers the request information into a *request context*, which is used to e
 
 A principal must be authenticated \(signed in to AWS\) using their credentials to send a request to AWS\. Some services, such as Amazon S3 and AWS STS, allow a few requests from anonymous users\. However, they are the exception to the rule\.
 
-To authenticate from the console as a root user, you must sign in with your email address and password\. As an IAM user, provide your account ID or alias, and then your user name and password\. To authenticate from the API or AWS CLI, you must provide your access key and secret key\. You might also be required to provide additional security information\. For example, AWS recommends that you use multi\-factor authentication \(MFA\) to increase the security of your account\. To learn more about the IAM entities that AWS can authenticate, see [IAM users](id_users.md) and [IAM roles](id_roles.md)\.
+To authenticate from the console as a root user, you must sign in with your email address and password\. As a federated user, you are authenticated by your identity provider and granted access to AWS resources by assuming IAM roles\. As an IAM user, provide your account ID or alias, and then your user name and password\. To authenticate workloads from the API or AWS CLI, you might use temporary credentials through being assigned a role or you might use long\-term credentials by providing your access key and secret key\. You might also be required to provide additional security information\. As a best practice, AWS recommends that you use multi\-factor authentication \(MFA\) and temporary credentials to increase the security of your account\. To learn more about the IAM entities that AWS can authenticate, see [IAM users](id_users.md) and [IAM roles](id_roles.md)\.
 
 ## Authorization<a name="intro-structure-authorization"></a>
 

@@ -2,11 +2,15 @@
 
 The following code examples demonstrate how to perform individual IAM actions with AWS SDKs\. These excerpts call the IAM API and are not intended to be run in isolation\. Each example includes a link to GitHub, where you can find instructions on how to set up and run the code in context\.
 
- The following examples include only the most commonly used actions\. For a complete list, see the [AWS Identity and Access Management API Reference](https://docs.aws.amazon.com/IAM/latest/APIReference/welcome.html)\. 
+ The following examples include only the most commonly used actions\. For a complete list, see the [AWS Identity and Access Management \(IAM\) API Reference](https://docs.aws.amazon.com/IAM/latest/APIReference/welcome.html)\. 
 
 **Topics**
++ [Add a user to a group](example_iam_AddUserToGroup_section.md)
 + [Attach a policy to a role](example_iam_AttachRolePolicy_section.md)
 + [Attach a policy to a user](example_iam_AttachUserPolicy_section.md)
++ [Attach an inline policy to a role](example_iam_PutRolePolicy_section.md)
++ [Create a SAML provider](example_iam_CreateSAMLProvider_section.md)
++ [Create a group](example_iam_CreateGroup_section.md)
 + [Create a policy](example_iam_CreatePolicy_section.md)
 + [Create a policy version](example_iam_CreatePolicyVersion_section.md)
 + [Create a role](example_iam_CreateRole_section.md)
@@ -14,7 +18,11 @@ The following code examples demonstrate how to perform individual IAM actions wi
 + [Create a user](example_iam_CreateUser_section.md)
 + [Create an access key](example_iam_CreateAccessKey_section.md)
 + [Create an alias for an account](example_iam_CreateAccountAlias_section.md)
++ [Create an inline policy for a group](example_iam_PutGroupPolicy_section.md)
 + [Create an inline policy for a user](example_iam_PutUserPolicy_section.md)
++ [Delete SAML provider](example_iam_DeleteSAMLProvider_section.md)
++ [Delete a group](example_iam_DeleteGroup_section.md)
++ [Delete a group policy](example_iam_DeleteGroupPolicy_section.md)
 + [Delete a policy](example_iam_DeletePolicy_section.md)
 + [Delete a role](example_iam_DeleteRole_section.md)
 + [Delete a role policy](example_iam_DeleteRolePolicy_section.md)
@@ -33,7 +41,9 @@ The following code examples demonstrate how to perform individual IAM actions wi
 + [Get a policy version](example_iam_GetPolicyVersion_section.md)
 + [Get a role](example_iam_GetRole_section.md)
 + [Get a server certificate](example_iam_GetServerCertificate_section.md)
++ [Get a service\-linked role's deletion status](example_iam_GetServiceLinkedRoleDeletionStatus_section.md)
 + [Get a summary of account usage](example_iam_GetAccountSummary_section.md)
++ [Get a user](example_iam_GetUser_section.md)
 + [Get data about the last use of an access key](example_iam_GetAccessKeyLastUsed_section.md)
 + [Get the account password policy](example_iam_GetAccountPasswordPolicy_section.md)
 + [List SAML providers](example_iam_ListSAMLProviders_section.md)
@@ -41,11 +51,14 @@ The following code examples demonstrate how to perform individual IAM actions wi
 + [List account aliases](example_iam_ListAccountAliases_section.md)
 + [List groups](example_iam_ListGroups_section.md)
 + [List inline policies for a role](example_iam_ListRolePolicies_section.md)
++ [List inline policies for a user](example_iam_ListUserPolicies_section.md)
 + [List policies](example_iam_ListPolicies_section.md)
 + [List policies attached to a role](example_iam_ListAttachedRolePolicies_section.md)
 + [List roles](example_iam_ListRoles_section.md)
 + [List server certificates](example_iam_ListServerCertificates_section.md)
 + [List users](example_iam_ListUsers_section.md)
++ [Remove a user from a group](example_iam_RemoveUserFromGroup_section.md)
 + [Update a server certificate](example_iam_UpdateServerCertificate_section.md)
 + [Update a user](example_iam_UpdateUser_section.md)
 + [Update an access key](example_iam_UpdateAccessKey_section.md)
++ [Upload a server certificate](example_iam_UploadServerCertificate_section.md)

@@ -1,19 +1,21 @@
 # What is IAM?<a name="introduction"></a>
 
-AWS Identity and Access Management \(IAM\) is a web service that helps you securely control access to AWS resources\. You use IAM to control who is authenticated \(signed in\) and authorized \(has permissions\) to use resources\.
+AWS Identity and Access Management \(IAM\) is a web service that helps you securely control access to AWS resources\. With IAM, you can centrally manage permissions that control which AWS resources users can access\. You use IAM to control who is authenticated \(signed in\) and authorized \(has permissions\) to use resources\.
 
-  When you create an AWS account, you begin with one sign\-in identity that has complete access to all AWS services and resources in the account\. This identity is called the AWS account *root user* and is accessed by signing in with the email address and password that you used to create the account\. We strongly recommend that you do not use the root user for your everyday tasks\. Safeguard your root user credentials and use them to perform the tasks that only the root user can perform\. For the complete list of tasks that require you to sign in as the root user, see [Tasks that require root user credentials](https://docs.aws.amazon.com/general/latest/gr/root-vs-iam.html#aws_tasks-that-require-root) in the *AWS General Reference*\. 
+  When you create an AWS account, you begin with one sign\-in identity that has complete access to all AWS services and resources in the account\. This identity is called the AWS account *root user* and is accessed by signing in with the email address and password that you used to create the account\. We strongly recommend that you don't use the root user for your everyday tasks\. Safeguard your root user credentials and use them to perform the tasks that only the root user can perform\. For the complete list of tasks that require you to sign in as the root user, see [Tasks that require root user credentials](https://docs.aws.amazon.com/accounts/latest/reference/root-user-tasks.html) in the *AWS Account Management Reference Guide*\. 
 
 **Topics**
 + [Video introduction to IAM](#intro-video)
 + [IAM features](#intro-features)
 + [Accessing IAM](#intro-accessing)
-+ [Understanding how IAM works](intro-structure.md)
++ [When do I use IAM?](when-to-use-iam.md)
++ [How IAM works](intro-structure.md)
 + [Overview of AWS identity management: Users](introduction_identity-management.md)
 + [Overview of access management: Permissions and policies](introduction_access-management.md)
 + [What is ABAC for AWS?](introduction_attribute-based-access-control.md)
 + [Security features outside IAM](introduction_security-outside-iam.md)
 + [Quick links to common tasks](introduction_quick-links-common-tasks.md)
++ [IAM console search](console_search.md)
 + [Using IAM with an AWS SDK](sdk-general-information-section.md)
 
 ## Video introduction to IAM<a name="intro-video"></a>
@@ -36,7 +38,7 @@ You can grant different permissions to different people for different resources\
 You can use IAM features to securely provide credentials for applications that run on EC2 instances\. These credentials provide permissions for your application to access other AWS resources\. Examples include S3 buckets and DynamoDB tables\. 
 
 **Multi\-factor authentication \(MFA\)**  
-You can add two\-factor authentication to your account and to individual users for extra security\. With MFA you or your users must provide not only a password or access key to work with your account, but also a code from a specially configured device\. If you already use a FIDO security key with other services, and it has an AWS supported configuration\. For more information, see [Supported configurations for using FIDO security keys](id_credentials_mfa_fido_supported_configurations.md)\. 
+You can add two\-factor authentication to your account and to individual users for extra security\. With MFA you or your users must provide not only a password or access key to work with your account, but also a code from a specially configured device\. If you already use a FIDO security key with other services, and it has an AWS supported configuration, you can use WebAuthn for MFA security\. For more information, see [Supported configurations for using FIDO security keys](id_credentials_mfa_fido_supported_configurations.md)\. 
 
 **Identity federation**  
 You can allow users who already have passwords elsewhere—for example, in your corporate network or with an internet identity provider—to get temporary access to your AWS account\. 
@@ -61,7 +63,7 @@ AWS Identity and Access Management \(IAM\) and AWS Security Token Service \(AWS 
 You can work with AWS Identity and Access Management in any of the following ways\.
 
 **AWS Management Console**  
-The console is a browser\-based interface to manage IAM and AWS resources\. For more information about accessing IAM through the console, see [Signing in to the AWS Management Console as an IAM user or root user](console.md)\. For a tutorial that guides you through using the console, see [Creating your first IAM admin user and user group](getting-started_create-admin-group.md)\.
+The console is a browser\-based interface to manage IAM and AWS resources\. For more information about accessing IAM through the console, see [How to sign in to AWS](https://docs.aws.amazon.com/signin/latest/userguide/how-to-sign-in.html) in the *AWS Sign\-In User Guide*\.
 
 **AWS Command Line Tools**  
 You can use the AWS command line tools to issue commands at your system's command line to perform IAM and AWS tasks\. Using the command line can be faster and more convenient than the console\. The command line tools are also useful if you want to build scripts that perform AWS tasks\.  
@@ -70,5 +72,5 @@ AWS provides two sets of command line tools: the [AWS Command Line Interface](ht
 **AWS SDKs**  
 AWS provides SDKs \(software development kits\) that consist of libraries and sample code for various programming languages and platforms \(Java, Python, Ruby, \.NET, iOS, Android, etc\.\)\. The SDKs provide a convenient way to create programmatic access to IAM and AWS\. For example, the SDKs take care of tasks such as cryptographically signing requests, managing errors, and retrying requests automatically\. For information about the AWS SDKs, including how to download and install them, see the [Tools for Amazon Web Services](https://aws.amazon.com/tools/) page\.
 
-**IAM HTTPS API**  
-You can access IAM and AWS programmatically by using the IAM HTTPS API, which lets you issue HTTPS requests directly to the service\. When you use the HTTPS API, you must include code to digitally sign requests using your credentials\. For more information, see [Calling the IAM API using HTTP query requests](programming.md) and the [IAM API Reference](https://docs.aws.amazon.com/IAM/latest/APIReference/)\.
+**IAM Query API**  
+You can access IAM and AWS programmatically by using the IAM Query API, which lets you issue HTTPS requests directly to the service\. When you use the Query API, you must include code to digitally sign requests using your credentials\. For more information, see [Calling the IAM API using HTTP query requests](programming.md) and the [IAM API Reference](https://docs.aws.amazon.com/IAM/latest/APIReference/)\.

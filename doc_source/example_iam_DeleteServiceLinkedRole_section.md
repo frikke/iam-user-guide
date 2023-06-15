@@ -6,10 +6,63 @@ The following code examples show how to delete an IAM service\-linked role\.
 The source code for these examples is in the [AWS Code Examples GitHub repository](https://github.com/awsdocs/aws-doc-sdk-examples)\. Have feedback on a code example? [Create an Issue](https://github.com/awsdocs/aws-doc-sdk-examples/issues/new/choose) in the code examples repo\. 
 
 ------
+#### [ Go ]
+
+**SDK for Go V2**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+  
+
+```
+// RoleWrapper encapsulates AWS Identity and Access Management (IAM) role actions
+// used in the examples.
+// It contains an IAM service client that is used to perform role actions.
+type RoleWrapper struct {
+	IamClient *iam.Client
+}
+
+
+
+// DeleteServiceLinkedRole deletes a service-linked role.
+func (wrapper RoleWrapper) DeleteServiceLinkedRole(roleName string) error {
+	_, err := wrapper.IamClient.DeleteServiceLinkedRole(context.TODO(), &iam.DeleteServiceLinkedRoleInput{
+		RoleName: aws.String(roleName)},
+	)
+	if err != nil {
+		log.Printf("Couldn't delete service-linked role %v. Here's why: %v\n", roleName, err)
+	}
+	return err
+}
+```
++  For API details, see [DeleteServiceLinkedRole](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.DeleteServiceLinkedRole) in *AWS SDK for Go API Reference*\. 
+
+------
+#### [ JavaScript ]
+
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
+  
+
+```
+import { DeleteServiceLinkedRoleCommand, IAMClient } from "@aws-sdk/client-iam";
+
+const client = new IAMClient({});
+
+/**
+ *
+ * @param {string} roleName
+ */
+export const deleteServiceLinkedRole = (roleName) => {
+  const command = new DeleteServiceLinkedRoleCommand({ RoleName: roleName });
+  return client.send(command);
+};
+```
++  For API details, see [DeleteServiceLinkedRole](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/deleteservicelinkedrolecommand.html) in *AWS SDK for JavaScript API Reference*\. 
+
+------
 #### [ Ruby ]
 
 **SDK for Ruby**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
   
 
 ```
@@ -17,27 +70,27 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
   #
   # @param role [Aws::IAM::Role] The role to delete.
   def delete_service_linked_role(role)
-      response = @iam_resource.client.delete_service_linked_role(role_name: role.name)
-      task_id = response.deletion_task_id
-      while true
-        response = @iam_resource.client.get_service_linked_role_deletion_status(
-          deletion_task_id: task_id)
-        status = response.status
-        puts("Deletion of #{role.name} #{status}.")
-        if %w(SUCCEEDED FAILED).include?(status)
-          break
-        else
-          sleep(3)
-        end
+    response = @iam_resource.client.delete_service_linked_role(role_name: role.name)
+    task_id = response.deletion_task_id
+    while true
+      response = @iam_resource.client.get_service_linked_role_deletion_status(
+        deletion_task_id: task_id)
+      status = response.status
+      puts("Deletion of #{role.name} #{status}.")
+      if %w(SUCCEEDED FAILED).include?(status)
+        break
+      else
+        sleep(3)
       end
-  rescue Aws::Errors::ServiceError => e
-    # If AWS has not yet fully propagated the role, it deletes the role but
-    # returns NoSuchEntity.
-    if e.code != "NoSuchEntity"
-      puts("Couldn't delete #{role.name}. Here's why:")
-      puts("\t#{e.code}: #{e.message}")
-      raise
     end
+rescue Aws::Errors::ServiceError => e
+  # If AWS has not yet fully propagated the role, it deletes the role but
+  # returns NoSuchEntity.
+  if e.code != "NoSuchEntity"
+    puts("Couldn't delete #{role.name}. Here's why:")
+    puts("\t#{e.code}: #{e.message}")
+    raise
+  end
   end
 ```
 +  For API details, see [DeleteServiceLinkedRole](https://docs.aws.amazon.com/goto/SdkForRubyV3/iam-2010-05-08/DeleteServiceLinkedRole) in *AWS SDK for Ruby API Reference*\. 
@@ -47,7 +100,7 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 
 **SDK for Rust**  
 This documentation is for an SDK in preview release\. The SDK is subject to change and should not be used in production\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
   
 
 ```

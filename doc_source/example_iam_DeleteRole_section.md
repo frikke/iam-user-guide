@@ -6,41 +6,77 @@ The following code examples show how to delete an IAM role\.
 The source code for these examples is in the [AWS Code Examples GitHub repository](https://github.com/awsdocs/aws-doc-sdk-examples)\. Have feedback on a code example? [Create an Issue](https://github.com/awsdocs/aws-doc-sdk-examples/issues/new/choose) in the code examples repo\. 
 
 ------
+#### [ \.NET ]
+
+**AWS SDK for \.NET**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
+  
+
+```
+    /// <summary>
+    /// Delete an IAM role.
+    /// </summary>
+    /// <param name="roleName">The name of the IAM role to delete.</param>
+    /// <returns>A Boolean value indicating the success of the action.</returns>
+    public async Task<bool> DeleteRoleAsync(string roleName)
+    {
+        var response = await _IAMService.DeleteRoleAsync(new DeleteRoleRequest { RoleName = roleName });
+        return response.HttpStatusCode == System.Net.HttpStatusCode.OK;
+    }
+```
++  For API details, see [DeleteRole](https://docs.aws.amazon.com/goto/DotNetSDKV3/iam-2010-05-08/DeleteRole) in *AWS SDK for \.NET API Reference*\. 
+
+------
+#### [ Go ]
+
+**SDK for Go V2**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+  
+
+```
+// RoleWrapper encapsulates AWS Identity and Access Management (IAM) role actions
+// used in the examples.
+// It contains an IAM service client that is used to perform role actions.
+type RoleWrapper struct {
+	IamClient *iam.Client
+}
+
+
+
+// DeleteRole deletes a role. All attached policies must be detached before a
+// role can be deleted.
+func (wrapper RoleWrapper) DeleteRole(roleName string) error {
+	_, err := wrapper.IamClient.DeleteRole(context.TODO(), &iam.DeleteRoleInput{
+		RoleName: aws.String(roleName),
+	})
+	if err != nil {
+		log.Printf("Couldn't delete role %v. Here's why: %v\n", roleName, err)
+	}
+	return err
+}
+```
++  For API details, see [DeleteRole](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.DeleteRole) in *AWS SDK for Go API Reference*\. 
+
+------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 Delete the role\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { DeleteRoleCommand } from "@aws-sdk/client-iam";
+import { DeleteRoleCommand, IAMClient } from "@aws-sdk/client-iam";
 
-// Set the parameters.
-const params = {
-    RoleName: "ROLE_NAME"
-}
+const client = new IAMClient({});
 
-const run = async () => {
-    try {
-        const data = await iamClient.send(new DeleteRoleCommand(params));
-        console.log("Success. Role deleted.", data);
-    } catch (err) {
-        console.log("Error", err);
-    }
+/**
+ *
+ * @param {string} roleName
+ */
+export const deleteRole = (roleName) => {
+  const command = new DeleteRoleCommand({ RoleName: roleName });
+  return client.send(command);
 };
-run();
 ```
 +  For API details, see [DeleteRole](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/deleterolecommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
@@ -48,7 +84,7 @@ run();
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```
@@ -71,7 +107,7 @@ def delete_role(role_name):
 #### [ Ruby ]
 
 **SDK for Ruby**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
   
 
 ```
@@ -102,31 +138,47 @@ def delete_role(role_name):
 
 **SDK for Rust**  
 This documentation is for an SDK in preview release\. The SDK is subject to change and should not be used in production\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
   
 
 ```
 pub async fn delete_role(client: &iamClient, role: &Role) -> Result<(), iamError> {
     let role = role.clone();
-    loop {
-        match client
-            .delete_role()
-            .role_name(role.role_name.as_ref().unwrap())
-            .send()
-            .await
-        {
-            Ok(_) => {
-                break;
-            }
-            Err(_) => {
-                sleep(Duration::from_secs(2)).await;
-            }
-        }
+    while client
+        .delete_role()
+        .role_name(role.role_name.as_ref().unwrap())
+        .send()
+        .await
+        .is_err()
+    {
+        sleep(Duration::from_secs(2)).await;
     }
     Ok(())
 }
 ```
 +  For API details, see [DeleteRole](https://docs.rs/releases/search?query=aws-sdk) in *AWS SDK for Rust API reference*\. 
+
+------
+#### [ Swift ]
+
+**SDK for Swift**  
+This is prerelease documentation for an SDK in preview release\. It is subject to change\.
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/swift/example_code/iam#code-examples)\. 
+  
+
+```
+    public func deleteRole(role: IAMClientTypes.Role) async throws {
+        let input = DeleteRoleInput(
+            roleName: role.roleName
+        )
+        do {
+            _ = try await iamClient.deleteRole(input: input)
+        } catch {
+            throw error
+        }
+    }
+```
++  For API details, see [DeleteRole](https://awslabs.github.io/aws-sdk-swift/reference/0.x) in *AWS SDK for Swift API reference*\. 
 
 ------
 

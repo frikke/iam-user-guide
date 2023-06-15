@@ -114,9 +114,7 @@ A service role is a role that a service assumes to perform actions in your accou
 
 For example, when you use AWS CodeBuild for the first time, the service creates a role named `codebuild-RWBCore-service-role`\. That service role uses the policy named `codebuild-RWBCore-managed-policy`\. If you edit the policy, it creates a new version and saves that version as the default version\. If you perform a subsequent operation in AWS CodeBuild, the service might try to update the policy\. If it does, you receive the following error:
 
-```
-codebuild.amazon.com did not create the default version (V2) of the codebuild-RWBCore-managed-policy policy that is attached to the codebuild-RWBCore-service-role role. To continue, detach the policy from any other identities and then delete the policy and the role.
-```
+`codebuild.amazon.com did not create the default version (V2) of the codebuild-RWBCore-managed-policy policy that is attached to the codebuild-RWBCore-service-role role. To continue, detach the policy from any other identities and then delete the policy and the role.`
 
 If you receive this error, you must make changes in IAM before you can continue with your service operation\. First, set the default policy version to V1 and try the operation again\. If V1 was previously deleted, or if choosing V1 doesn't work, then clean up and delete the existing policy and role\.
 
@@ -130,9 +128,9 @@ For more information on editing managed policies, see [Editing customer managed 
 
 1. In the list of policies, choose the name of the policy that you want to delete\.
 
-1. Choose the **Policy usage** tab to view which IAM users, groups, or roles use this policy\. If any of these identities use the policy, complete the following tasks:
+1. Choose the **Entities attached** tab to view which IAM users, groups, or roles use this policy\. If any of these identities use the policy, complete the following tasks:
 
-   1. Create a new managed policy with the necessary permissions\. To ensure that the identities have the same permissions before and after your actions, copy the JSON policy document from the existing policy\. Then create the new managed policy and paste the JSON document as described in [Creating Policies on the JSON Tab](access_policies_create-console.md#access_policies_create-json-editor)\.
+   1. Create a new managed policy with the necessary permissions\. To ensure that the identities have the same permissions before and after your actions, copy the JSON policy document from the existing policy\. Then create the new managed policy and paste the JSON document as described in [Creating Policies using the JSON editor](access_policies_create-console.md#access_policies_create-json-editor)\.
 
    1. For each affected identity, attach the new policy and then detach the old one\. For more information, see [Adding and removing IAM identity permissions](access_policies_manage-attach-detach.md)\.
 

@@ -1,6 +1,9 @@
 # Create an IAM user using an AWS SDK<a name="example_iam_CreateUser_section"></a>
 
-The following code examples show how to create an IAM user\.
+The following code examples show how to create an IAM user\. 
+
+**Warning**  
+To avoid security risks, don't use IAM users for authentication when developing purpose\-built software or working with real data\. Instead, use federation with an identity provider such as [AWS IAM Identity Center \(successor to AWS Single Sign\-On\)](https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html)\.
 
 **Note**  
 The source code for these examples is in the [AWS Code Examples GitHub repository](https://github.com/awsdocs/aws-doc-sdk-examples)\. Have feedback on a code example? [Create an Issue](https://github.com/awsdocs/aws-doc-sdk-examples/issues/new/choose) in the code examples repo\. 
@@ -9,54 +12,78 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 #### [ \.NET ]
 
 **AWS SDK for \.NET**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
   
 
 ```
-        /// <summary>
-        /// Create a new IAM user.
-        /// </summary>
-        /// <param name="client">The initialized IAM client object.</param>
-        /// <param name="userName">A string representing the user name of the
-        /// new user.</param>
-        /// <returns>The newly created user.</returns>
-        public static async Task<User> CreateUserAsync(
-            AmazonIdentityManagementServiceClient client,
-            string userName)
-        {
-            var request = new CreateUserRequest
-            {
-                UserName = userName,
-            };
-
-            var response = await client.CreateUserAsync(request);
-
-            return response.User;
-        }
+    /// <summary>
+    /// Create an IAM user.
+    /// </summary>
+    /// <param name="userName">The username for the new IAM user.</param>
+    /// <returns>The IAM user that was created.</returns>
+    public async Task<User> CreateUserAsync(string userName)
+    {
+        var response = await _IAMService.CreateUserAsync(new CreateUserRequest { UserName = userName });
+        return response.User;
+    }
 ```
 +  For API details, see [CreateUser](https://docs.aws.amazon.com/goto/DotNetSDKV3/iam-2010-05-08/CreateUser) in *AWS SDK for \.NET API Reference*\. 
+
+------
+#### [ C\+\+ ]
+
+**SDK for C\+\+**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/cpp/example_code/iam#code-examples)\. 
+  
+
+```
+    Aws::IAM::IAMClient iam(clientConfig);
+
+    Aws::IAM::Model::CreateUserRequest create_request;
+    create_request.SetUserName(userName);
+
+    auto create_outcome = iam.CreateUser(create_request);
+    if (!create_outcome.IsSuccess()) {
+        std::cerr << "Error creating IAM user " << userName << ":" <<
+                  create_outcome.GetError().GetMessage() << std::endl;
+    }
+    else {
+        std::cout << "Successfully created IAM user " << userName << std::endl;
+    }
+
+    return create_outcome.IsSuccess();
+```
++  For API details, see [CreateUser](https://docs.aws.amazon.com/goto/SdkForCpp/iam-2010-05-08/CreateUser) in *AWS SDK for C\+\+ API Reference*\. 
 
 ------
 #### [ Go ]
 
 **SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
   
 
 ```
-	// CreateUser
+// UserWrapper encapsulates user actions used in the examples.
+// It contains an IAM service client that is used to perform user actions.
+type UserWrapper struct {
+	IamClient *iam.Client
+}
 
-	fmt.Println("➡️ Create user " + ExampleUserName)
 
-	createUserResult, err := service.CreateUser(context.Background(), &iam.CreateUserInput{
-		UserName: aws.String(ExampleUserName),
+
+// CreateUser creates a new user with the specified name.
+func (wrapper UserWrapper) CreateUser(userName string) (*types.User, error) {
+	var user *types.User
+	result, err := wrapper.IamClient.CreateUser(context.TODO(), &iam.CreateUserInput{
+		UserName: aws.String(userName),
 	})
-
 	if err != nil {
-		panic("Couldn't create user: " + err.Error())
+		log.Printf("Couldn't create user %v. Here's why: %v\n", userName, err)
+	} else {
+		user = result.User
 	}
-
-	fmt.Printf("Created user %s\n", *createUserResult.User.Arn)
+	return user, err
+}
 ```
 +  For API details, see [CreateUser](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.CreateUser) in *AWS SDK for Go API Reference*\. 
 
@@ -64,7 +91,7 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 #### [ Java ]
 
 **SDK for Java 2\.x**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javav2/example_code/iam#readme)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javav2/example_code/iam#readme)\. 
   
 
 ```
@@ -101,53 +128,29 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 Create the user\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { GetUserCommand, CreateUserCommand } from "@aws-sdk/client-iam";
+import { CreateUserCommand, IAMClient } from "@aws-sdk/client-iam";
 
-// Set the parameters.
-export const params = { UserName: "USER_NAME" }; //USER_NAME
+const client = new IAMClient({});
 
-export const run = async () => {
-  try {
-    const data = await iamClient.send(new GetUserCommand(params));
-    console.log(
-      "User " + "USER_NAME" + " already exists",
-      data.User.UserId
-    );
-    return data;
-  } catch (err) {
-    try {
-      const results = await iamClient.send(new CreateUserCommand(params));
-      console.log("Success", results);
-      return results;
-    } catch (err) {
-      console.log("Error", err);
-    }
-  }
+/**
+ *
+ * @param {string} name
+ */
+export const createUser = (name) => {
+  const command = new CreateUserCommand({ UserName: name });
+  return client.send(command);
 };
-run();
 ```
 +  For more information, see [AWS SDK for JavaScript Developer Guide](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/iam-examples-managing-users.html#iam-examples-managing-users-creating-users)\. 
 +  For API details, see [CreateUser](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/createusercommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
-**SDK for JavaScript V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
+**SDK for JavaScript \(v2\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
   
 
 ```
@@ -185,7 +188,7 @@ iam.getUser(params, function(err, data) {
 
 **SDK for Kotlin**  
 This is prerelease documentation for a feature in preview release\. It is subject to change\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
   
 
 ```
@@ -207,12 +210,12 @@ suspend fun createIAMUser(usernameVal: String?): String? {
 #### [ PHP ]
 
 **SDK for PHP**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
   
 
 ```
 $uuid = uniqid();
-$service = new IamService();
+$service = new IAMService();
 
 $user = $service->createUser("iam_demo_user_$uuid");
 echo "Created user with the arn: {$user['Arn']}\n";
@@ -238,7 +241,7 @@ echo "Created user with the arn: {$user['Arn']}\n";
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```
@@ -264,7 +267,7 @@ def create_user(user_name):
 #### [ Ruby ]
 
 **SDK for Ruby**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
   
 
 ```
@@ -291,7 +294,7 @@ def create_user(user_name):
 
 **SDK for Rust**  
 This documentation is for an SDK in preview release\. The SDK is subject to change and should not be used in production\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
   
 
 ```
@@ -302,6 +305,35 @@ pub async fn create_user(client: &iamClient, user_name: &str) -> Result<User, ia
 }
 ```
 +  For API details, see [CreateUser](https://docs.rs/releases/search?query=aws-sdk) in *AWS SDK for Rust API reference*\. 
+
+------
+#### [ Swift ]
+
+**SDK for Swift**  
+This is prerelease documentation for an SDK in preview release\. It is subject to change\.
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/swift/example_code/iam#code-examples)\. 
+  
+
+```
+    public func createUser(name: String) async throws -> String {
+        let input = CreateUserInput(
+            userName: name
+        )
+        do {
+            let output = try await client.createUser(input: input)
+            guard let user = output.user else {
+                throw ServiceHandlerError.noSuchUser
+            }
+            guard let id = user.userId else {
+                throw ServiceHandlerError.noSuchUser
+            }
+            return id
+        } catch {
+            throw error
+        }
+    }
+```
++  For API details, see [CreateUser](https://awslabs.github.io/aws-sdk-swift/reference/0.x) in *AWS SDK for Swift API reference*\. 
 
 ------
 

@@ -6,7 +6,7 @@ To use a [policy](access_policies.md) to control access in AWS, you must underst
 
 AWS then checks that you \(the principal\) are authenticated \(signed in\) and authorized \(have permission\) to perform the specified action on the specified resource\. During authorization, AWS checks all the policies that apply to the context of your request\. Most policies are stored in AWS as [JSON documents](access_policies.md#access_policies-json) and specify the permissions for principal entities\. For more information about policy types and uses, see [Policies and permissions in IAM](access_policies.md)\.
 
-AWS authorizes the request only if each part of your request is allowed by the policies\. To view a diagram of this process, see [Understanding how IAM works](intro-structure.md)\. For details about how AWS determines whether a request is allowed, see [Policy evaluation logic](reference_policies_evaluation-logic.md)\. 
+AWS authorizes the request only if each part of your request is allowed by the policies\. To view a diagram of this process, see [How IAM works](intro-structure.md)\. For details about how AWS determines whether a request is allowed, see [Policy evaluation logic](reference_policies_evaluation-logic.md)\. 
 
 When you create an IAM policy, you can control access to the following:
 + **[Principals](#access_controlling-principals)** – Control what the person making the request \(the [principal](intro-structure.md#intro-structure-principal)\) is allowed to do\. 
@@ -19,7 +19,7 @@ Policies let you specify who has access to AWS resources, and what actions they 
 
 For example, you might grant a user permission to list his or her own access keys\. You might also expand that permission and also let each user create, update, and delete their own keys\. 
 
-When you give permissions to a user group, all users in that user group get those permissions\. For example, you can give the Administrators user group permission to perform any of the IAM actions on any of the AWS account resources\. Another example: You can give the Managers user group permission to describe the AWS account's Amazon EC2 instances\.
+When you give permissions to a user group, all users in that user group get those permissions\. For example, you can give the Administrators user group permission to perform any of the IAM actions on any of the AWS account resources\. Another example: You can give the Managers user group permission to describe the Amazon EC2 instances of the AWS account\.
 
 For information about how to delegate basic permissions to your users, user groups, and roles, see [Permissions required to access IAM resources](access_permissions-required.md)\. For additional examples of policies that illustrate basic permissions, see [Example policies for administering IAM resources](id_credentials_delegate-permissions_examples.md)\.
 
@@ -66,7 +66,7 @@ For detailed information about the procedures mentioned previously, refer to the
 + To learn how to attach an IAM policy to a principal, see [Adding and removing IAM identity permissions](access_policies_manage-attach-detach.md)\.
 + To see an example policy for granting full access to EC2, see [Amazon EC2: Allows full EC2 access within a specific Region, programmatically and in the console](reference_policies_examples_ec2_region.md)\.
 + To allow read\-only access to an S3 bucket, use the first two statements of the following example policy: [Amazon S3: Allows read and write access to objects in an S3 Bucket, programmatically and in the console](reference_policies_examples_s3_rw-bucket-console.md)\.
-+ To see an example policy for allowing users to set or rotate their credentials, such as their console password, their programmatic access keys, and their MFA devices, see [AWS: Allows MFA\-authenticated IAM users to manage their own credentials on the My Security Credentials page](reference_policies_examples_aws_my-sec-creds-self-manage.md)\.
++ To see an example policy for allowing users to set or rotate their credentials, such as their console password, their programmatic access keys, and their MFA devices, see [AWS: Allows MFA\-authenticated IAM users to manage their own credentials on the My security credentials page](reference_policies_examples_aws_my-sec-creds-self-manage.md)\.
 
 ## Controlling access to identities<a name="access_controlling-identities"></a>
 
@@ -84,22 +84,23 @@ For example, you can create a user group named **AllUsers**, and then attach tha
 
 1. Choose **Create policy**\.
 
-1. On the **Visual editor** tab, choose **Choose a service** to get started\. Then choose **IAM**\.
+1. On the **Policy editor** section, choose the **Visual** option\.
 
-1. Choose **Select actions** and then type **group** in the search box\. The visual editor shows all the IAM actions that contain the word `group`\. Select all of the check boxes\.
+1. In **Select a service** choose **IAM**\.
 
-1. Choose **Resources** to specify resources for your policy\. Based on the actions you chose, you should see **group**, **group\-path**, and **user** resource types\.
-   + **group** – Choose **Add ARN**\. For **Resource**, select the check box next to **Any**\. For **Group Name With Path**, type the user group name **AllUsers**\. Then choose **Add**\.
-   + **group\-path** – Select the check box next to **Any**\.
-   + **user** – Select the check box next to **Any**\.
+1. In **Actions allowed**, type **group** in the search box\. The visual editor shows all the IAM actions that contain the word `group`\. Select all of the check boxes\.
 
-   One of the actions that you chose, `ListGroups`, does not support using specific resources\. You do not have to choose **All resources** for that action\. When you save your policy or view the policy on the **JSON** tab, you can see that IAM automatically creates a new permission block granting this action permission on all resources\.
+1. Choose **Resources** to specify resources for your policy\. Based on the actions you chose, you should see **group** and **user** resource types\.
+   + **group** – Choose **Add ARNs**\. For **Resource in**, select the **Any account** option\. Select the **Any group name with path** check box and then type the user group name **AllUsers**\. Then choose **Add ARNs**\.
+   + **user** – Select the check box next to **Any in this account**\.
 
-1. To add another permission block, choose **Add additional permissions**\.
+   One of the actions that you chose, `ListGroups`, does not support using specific resources\. You do not have to choose **All resources** for that action\. When you save your policy or view the policy in the **JSON** editor, you can see that IAM automatically creates a new permission block granting this action permission on all resources\.
 
-1. Choose **Choose a service** and then choose **IAM**\.
+1. To add another permission block, choose **Add more permissions**\.
 
-1. Choose **Select actions** and then choose **Switch to deny permissions**\. When you do that, the entire block is used to deny permissions\.
+1. Choose **Select a service** and then choose **IAM**\.
+
+1. Choose **Actions allowed** and then choose **Switch to deny permissions**\. When you do that, the entire block is used to deny permissions\.
 
 1. Type **group** in the search box\. The visual editor shows you all the IAM actions that contain the word `group`\. Select the check boxes next to the following actions:
    + **CreateGroup**
@@ -111,25 +112,25 @@ For example, you can create a user group named **AllUsers**, and then attach tha
    + **PutGroupPolicy**
    + **UpdateGroup**
 
-1. Choose **Resources** to specify the resources for your policy\. Based on the actions that you chose, you should see the **group** resource type\. Choose **Add ARN**\. For **Resource**, select the check box next to **Any**\. For **Group Name With Path**, type the user group name **AllUsers**\. Then choose **Add**\.
+1. Choose **Resources** to specify the resources for your policy\. Based on the actions that you chose, you should see the **group** resource type\. Choose **Add ARNs**\. For **Resource in**, select the **Any account** option\. For **Any group name with path**, type the user group name **AllUsers**\. Then choose **Add ARNs**\.
 
-1. Choose **Specify request conditions \(optional\)** and then choose **Add condition**\. Complete the form with the following values:
-   + **Key** – Choose **aws:username**
+1. Choose **Request conditions \- *optional*** and then choose **Add another condition**\. Complete the form with the following values:
+   + **Condition key** – Choose **aws:username**
    + **Qualifier** – Choose **Default**
    + **Operator** – Choose **StringNotEquals**
-   + **Value** – Type **srodriguez** and then choose **Add another condition value**\. Type **mjackson** and then choose **Add another condition value**\. Type **adesai** and then choose **Add**\.
+   + **Value** – Type **srodriguez** and then choose **Add** to add another value\. Type **mjackson** and then choose **Add** to add another value\. Type **adesai** and then choose **Add condition**\.
 
    This condition ensures that access will be denied to the specified user group management actions when the user making the call is not included in the list\. Because this explicitly denies permission, it overrides the previous block that allowed those users to call the actions\. Users on the list are not denied access, and they are granted permission in the first permission block, so they can fully manage the user group\.
 
-1. When you are finished, choose **Review policy**\.
+1. When you are finished, choose **Next**\.
 **Note**  
-You can switch between the **Visual editor** and **JSON** tabs any time\. However, if you make changes or choose **Review policy** in the **Visual editor** tab, IAM might restructure your policy to optimize it for the visual editor\. For more information, see [Policy restructuring](troubleshoot_policies.md#troubleshoot_viseditor-restructure)\.
+You can switch between the **Visual** and **JSON** editor options any time\. However, if you make changes or choose **Next** in the **Visual** editor option, IAM might restructure your policy to optimize it for the visual editor\. For more information, see [Policy restructuring](troubleshoot_policies.md#troubleshoot_viseditor-restructure)\.
 
-1. On the **Review policy** page, for the **Name**, type **LimitAllUserGroupManagement**\. For the **Description**, type **Allows all users read\-only access to a specific user group, and allows only specific users access to make changes to the user group**\. Review the policy summary to make sure that you have granted the intended permissions\. Then choose **Create policy** to save your new policy\.
+1. On the **Review and create** page, for the **Policy Name**, type **LimitAllUserGroupManagement**\. For the **Description**, type **Allows all users read\-only access to a specific user group, and allows only specific users access to make changes to the user group**\. Review **Permissions defined in this policy** to make sure that you have granted the intended permissions\. Then choose **Create policy** to save your new policy\.
 
 1. Attach the policy to your user group\. For more information, see [Adding and removing IAM identity permissions](access_policies_manage-attach-detach.md)\.
 
-Alternatively, you can create the same policy using this example JSON policy document\. To view this JSON policy, see [IAM: Allows specific IAM users to manage a group programmatically and in the console](reference_policies_examples_iam_users-manage-group.md)\. For detailed instructions for creating a policy using a JSON document, see [Creating policies on the JSON tab](access_policies_create-console.md#access_policies_create-json-editor)\.
+Alternatively, you can create the same policy using this example JSON policy document\. To view this JSON policy, see [IAM: Allows specific IAM users to manage a group programmatically and in the console](reference_policies_examples_iam_users-manage-group.md)\. For detailed instructions for creating a policy using a JSON document, see [Creating policies using the JSON editor](access_policies_create-console.md#access_policies_create-json-editor)\.
 
 ## Controlling access to policies<a name="access_controlling-policies"></a>
 
@@ -137,7 +138,7 @@ You can control how your users can apply AWS managed policies\. To do this, atta
 
 For example, you might create a policy that allows users to attach only the [IAMUserChangePassword](https://console.aws.amazon.com/iam/home#policies/arn:aws:iam::aws:policy/job-function/IAMUserChangePassword) and [PowerUserAccess](https://console.aws.amazon.com/iam/home#policies/arn:aws:iam::aws:policy/job-function/PowerUserAccess) AWS managed policies to a new IAM user, user group, or role\.
 
-For customer managed policies, you can control who can create, update, and delete these policies\. You can control who can attach and detach policies to and from principal entities \(user groups, users, and roles\)\. You can also control which policies a user can attach or detach, and to and from which entities\. 
+For customer managed policies, you can control who can create, update, and delete these policies\. You can control who can attach and detach policies to and from principal entities \(user groups, users, and roles\)\. You can also control which policies a user can attach or detach, and to and from which entities\.
 
 For example, you can give permissions to an account administrator to create, update, and delete policies\. Then you give permissions to a team leader or other limited administrator to attach and detach these policies to and from principal entities that the limited administrator manages\.
 
@@ -157,7 +158,7 @@ You can use [IAM policies](access_policies.md) to control who is allowed to crea
 
 The API operations in the preceding list correspond to actions that you can allow or deny—that is, permissions that you can grant—using an IAM policy\. 
 
-Consider the following example policy\. It allows a user to create, update \(that is, create a new policy version\), delete, and set a default version for all customer managed policies in the AWS account\. The example policy also allows the user to list policies and get policies\. To learn how to create a policy using this example JSON policy document, see [Creating policies on the JSON tab](access_policies_create-console.md#access_policies_create-json-editor)\.
+Consider the following example policy\. It allows a user to create, update \(that is, create a new policy version\), delete, and set a default version for all customer managed policies in the AWS account\. The example policy also allows the user to list policies and get policies\. To learn how to create a policy using this example JSON policy document, see [Creating policies using the JSON editor](access_policies_create-console.md#access_policies_create-json-editor)\.
 
 **Example policy that allows creating, updating, deleting, listing, getting, and setting the default version for all policies**  
 
@@ -184,7 +185,7 @@ Consider the following example policy\. It allows a user to create, update \(tha
 
 You can create policies that limit the use of these API operations to affect only the managed policies that you specify\. For example, you might want to allow a user to set the default version and delete policy versions, but only for specific customer managed policies\. You do this by specifying the policy ARN in the `Resource` element of the policy that grants these permissions\. 
 
-The following example shows a policy that allows a user to delete policy versions and set the default version\. But these actions are only allowed for the customer managed policies that include the path /TEAM\-A/\. The customer managed policy ARN is specified in the `Resource` element of the policy\. \(In this example the ARN includes a path and a wildcard and thus matches all customer managed policies that include the path /TEAM\-A/\)\. To learn how to create a policy using this example JSON policy document, see [Creating policies on the JSON tab](access_policies_create-console.md#access_policies_create-json-editor)\.
+The following example shows a policy that allows a user to delete policy versions and set the default version\. But these actions are only allowed for the customer managed policies that include the path /TEAM\-A/\. The customer managed policy ARN is specified in the `Resource` element of the policy\. \(In this example the ARN includes a path and a wildcard and thus matches all customer managed policies that include the path /TEAM\-A/\)\. To learn how to create a policy using this example JSON policy document, see [Creating policies using the JSON editor](access_policies_create-console.md#access_policies_create-json-editor)\.
 
 For more information about using paths in the names of customer managed policies, see [Friendly names and paths](reference_identifiers.md#identifiers-friendly-names)\. 
 
@@ -218,7 +219,7 @@ The following list shows API operations that pertain directly to attaching and d
 
 You can create policies that limit the use of these API operations to affect only the specific managed policies and/or principal entities that you specify\. For example, you might want to allow a user to attach managed policies, but only the managed policies that you specify\. Or, you might want to allow a user to attach managed policies, but only to the principal entities that you specify\. 
 
-The following example policy allows a user to attach managed policies to only the user groups and roles that include the path /TEAM\-A/\. The user group and role ARNs are specified in the `Resource` element of the policy\. \(In this example the ARNs include a path and a wildcard character and thus match all user groups and roles that include the path /TEAM\-A/\)\. To learn how to create a policy using this example JSON policy document, see [Creating policies on the JSON tab](access_policies_create-console.md#access_policies_create-json-editor)\.
+The following example policy allows a user to attach managed policies to only the user groups and roles that include the path /TEAM\-A/\. The user group and role ARNs are specified in the `Resource` element of the policy\. \(In this example the ARNs include a path and a wildcard character and thus match all user groups and roles that include the path /TEAM\-A/\)\. To learn how to create a policy using this example JSON policy document, see [Creating policies using the JSON editor](access_policies_create-console.md#access_policies_create-json-editor)\.
 
 **Example policy that allows attaching managed policies to only specific user groups or roles**  
 
@@ -241,7 +242,7 @@ The following example policy allows a user to attach managed policies to only th
 
 You can further limit the actions in the preceding example to affect only specific policies\. That is, you can control which permissions a user is allowed to attach to other principal entities—by adding a condition to the policy\. 
 
-In the following example, the condition ensures that the `AttachGroupPolicy` and `AttachRolePolicy` permissions are allowed only when the policy being attached matches one of the specified policies\. The condition uses the `iam:PolicyARN` [condition key](reference_policies_elements_condition.md) to determine which policy or policies are allowed to be attached\. The following example policy expands on the previous example\. It allows a user to attach only the managed policies that include the path /TEAM\-A/ to only the user groups and roles that include the path /TEAM\-A/\. To learn how to create a policy using this example JSON policy document, see [Creating policies on the JSON tab](access_policies_create-console.md#access_policies_create-json-editor)\.
+In the following example, the condition ensures that the `AttachGroupPolicy` and `AttachRolePolicy` permissions are allowed only when the policy being attached matches one of the specified policies\. The condition uses the `iam:PolicyARN` [condition key](reference_policies_elements_condition.md) to determine which policy or policies are allowed to be attached\. The following example policy expands on the previous example\. It allows a user to attach only the managed policies that include the path /TEAM\-A/ to only the user groups and roles that include the path /TEAM\-A/\. To learn how to create a policy using this example JSON policy document, see [Creating policies using the JSON editor](access_policies_create-console.md#access_policies_create-json-editor)\.
 
 ```
 {
@@ -263,7 +264,7 @@ In the following example, the condition ensures that the `AttachGroupPolicy` and
 }
 ```
 
-This policy uses the `ArnLike` condition operator because the ARN includes a wildcard character\. For a specific ARN, use the `ArnEquals` condition operator\. For more information about `ArnLike` and `ArnEquals`, see [Amazon Resource Name \(ARN\) condition operators](reference_policies_elements_condition_operators.md#Conditions_ARN) in the *Condition Types* section of the *Policy Element Reference*\. 
+This policy uses the `ArnLike` condition operator, but you can also use the `ArnEquals` condition operator because these two condition operators behave identically\. For more information about `ArnLike` and `ArnEquals`, see [Amazon Resource Name \(ARN\) condition operators](reference_policies_elements_condition_operators.md#Conditions_ARN) in the *Condition Types* section of the *Policy Element Reference*\. 
 
 For example, you can limit the use of actions to involve only the managed policies that you specify\. You do this by specifying the policy ARN in the `Condition` element of the policy that grants these permissions\. For example, to specify the ARN of a customer managed policy:
 

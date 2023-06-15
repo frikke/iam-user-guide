@@ -1,6 +1,6 @@
 # Controlling access to and for IAM users and roles using tags<a name="access_iam-tags"></a>
 
-Use the information in the following section to control who can access your IAM users and roles and what resources your users and roles can access\. For more general information and examples of controlling access to other AWS resources, including other IAM resources, see [Controlling access to AWS resources using tags](access_tags.md)\.
+Use the information in the following section to control who can access your IAM users and roles and what resources your users and roles can access\. For more general information and examples of controlling access to other AWS resources, including other IAM resources, see [Tagging IAM resources](id_tags.md)\.
 
 Tags can be attached to the IAM *resource*, passed in the *request*, or attached to the *principal* that is making the request\. An IAM user or role can be both a resource and principal\. For example, you can write a policy that allows a user to list the groups for a user\. This operation is allowed only if the user making the request \(the principal\) has the same `project=blue` tag as the user they're trying to view\. In this example, the user can view the group membership for any user, including themselves, as long as they are working on the same project\.
 
@@ -11,6 +11,9 @@ To control access based on tags, you provide tag information in the [condition e
 + **[Any part of the authorization process](#access_iam-tags_control-tag-keys)** – Use the **aws:TagKeys** condition key to control whether specific tag keys can be used on a resource, in a request, or by a principal\. In this case, the key value does not matter\. This key behaves similarly for IAM resources and other AWS resources\. However, when you tag a user in IAM, this also controls whether the principal can make the request to any service\. For more information, see [Controlling access based on tag keys](access_tags.md#access_tags_control-tag-keys)\.
 
 You can create an IAM policy using the visual editor, using JSON, or by importing an existing managed policy\. For details, see [Creating IAM policies](access_policies_create.md)\.
+
+**Note**  
+You can also pass [session tags](id_session-tags.md) when you assume an IAM role or federate a user\. These are valid only for the length of the session\.
 
 ## Controlling access for IAM principals<a name="access_iam-tags_control-principals"></a>
 

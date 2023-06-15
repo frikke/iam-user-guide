@@ -1,50 +1,83 @@
 # Get an IAM server certificate using an AWS SDK<a name="example_iam_GetServerCertificate_section"></a>
 
-The following code example shows how to get an IAM server certificate\.
+The following code examples show how to get an IAM server certificate\.
 
 **Note**  
 The source code for these examples is in the [AWS Code Examples GitHub repository](https://github.com/awsdocs/aws-doc-sdk-examples)\. Have feedback on a code example? [Create an Issue](https://github.com/awsdocs/aws-doc-sdk-examples/issues/new/choose) in the code examples repo\. 
 
 ------
+#### [ C\+\+ ]
+
+**SDK for C\+\+**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/cpp/example_code/iam#code-examples)\. 
+  
+
+```
+bool AwsDoc::IAM::getServerCertificate(const Aws::String &certificateName,
+                                       const Aws::Client::ClientConfiguration &clientConfig) {
+    Aws::IAM::IAMClient iam(clientConfig);
+    Aws::IAM::Model::GetServerCertificateRequest request;
+    request.SetServerCertificateName(certificateName);
+
+    auto outcome = iam.GetServerCertificate(request);
+    bool result = true;
+    if (!outcome.IsSuccess()) {
+        if (outcome.GetError().GetErrorType() != Aws::IAM::IAMErrors::NO_SUCH_ENTITY) {
+            std::cerr << "Error getting server certificate " << certificateName <<
+                      ": " << outcome.GetError().GetMessage() << std::endl;
+            result = false;
+        }
+        else {
+            std::cout << "Certificate '" << certificateName
+                      << "' not found." << std::endl;
+        }
+    }
+    else {
+        const auto &certificate = outcome.GetResult().GetServerCertificate();
+        std::cout << "Name: " <<
+                  certificate.GetServerCertificateMetadata().GetServerCertificateName()
+                  << std::endl << "Body: " << certificate.GetCertificateBody() <<
+                  std::endl << "Chain: " << certificate.GetCertificateChain() <<
+                  std::endl;
+    }
+
+    return result;
+}
+```
++  For API details, see [GetServerCertificate](https://docs.aws.amazon.com/goto/SdkForCpp/iam-2010-05-08/GetServerCertificate) in *AWS SDK for C\+\+ API Reference*\. 
+
+------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 Get a server certificate\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { GetServerCertificateCommand } from "@aws-sdk/client-iam";
+import { GetServerCertificateCommand, IAMClient } from "@aws-sdk/client-iam";
 
-// Set the parameters.
-export const params = { ServerCertificateName: "CERTIFICATE_NAME" }; //CERTIFICATE_NAME
+const client = new IAMClient({});
 
-export const run = async () => {
-  try {
-    const data = await iamClient.send(new GetServerCertificateCommand(params));
-    console.log("Success", data);
-    return data;
-  } catch (err) {
-    console.log("Error", err);
-  }
+/**
+ *
+ * @param {string} certName
+ * @returns
+ */
+export const getServerCertificate = async (certName) => {
+  const command = new GetServerCertificateCommand({
+    ServerCertificateName: certName,
+  });
+
+  const response = await client.send(command);
+  console.log(response);
+  return response;
 };
 ```
 +  For more information, see [AWS SDK for JavaScript Developer Guide](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/iam-examples-server-certificates.html#iam-examples-server-certificates-getting)\. 
 +  For API details, see [GetServerCertificate](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/getservercertificatecommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
-**SDK for JavaScript V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
+**SDK for JavaScript \(v2\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
   
 
 ```

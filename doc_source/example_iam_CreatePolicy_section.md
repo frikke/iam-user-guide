@@ -9,78 +9,141 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 #### [ \.NET ]
 
 **AWS SDK for \.NET**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
   
 
 ```
-        /// <summary>
-        /// Create a policy to allow a user to list the buckets in an account.
-        /// </summary>
-        /// <param name="client">The initialized IAM client object.</param>
-        /// <param name="policyName">The name of the poicy to create.</param>
-        /// <param name="policyDocument">The permissions policy document.</param>
-        /// <returns>The newly created ManagedPolicy object.</returns>
-        public static async Task<ManagedPolicy> CreatePolicyAsync(
-            AmazonIdentityManagementServiceClient client,
-            string policyName,
-            string policyDocument)
+    /// <summary>
+    /// Create an IAM policy.
+    /// </summary>
+    /// <param name="policyName">The name to give the new IAM policy.</param>
+    /// <param name="policyDocument">The policy document for the new policy.</param>
+    /// <returns>The new IAM policy object.</returns>
+    public async Task<ManagedPolicy> CreatePolicyAsync(string policyName, string policyDocument)
+    {
+        var response = await _IAMService.CreatePolicyAsync(new CreatePolicyRequest
         {
-            var request = new CreatePolicyRequest
-            {
-                PolicyName = policyName,
-                PolicyDocument = policyDocument,
-            };
+            PolicyDocument = policyDocument,
+            PolicyName = policyName,
+        });
 
-            var response = await client.CreatePolicyAsync(request);
-
-            return response.Policy;
-        }
+        return response.Policy;
+    }
 ```
 +  For API details, see [CreatePolicy](https://docs.aws.amazon.com/goto/DotNetSDKV3/iam-2010-05-08/CreatePolicy) in *AWS SDK for \.NET API Reference*\. 
+
+------
+#### [ C\+\+ ]
+
+**SDK for C\+\+**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/cpp/example_code/iam#code-examples)\. 
+  
+
+```
+Aws::String AwsDoc::IAM::createPolicy(const Aws::String &policyName,
+                                      const Aws::String &rsrcArn,
+                                      const Aws::Client::ClientConfiguration &clientConfig) {
+    Aws::IAM::IAMClient iam(clientConfig);
+
+    Aws::IAM::Model::CreatePolicyRequest request;
+    request.SetPolicyName(policyName);
+    request.SetPolicyDocument(BuildSamplePolicyDocument(rsrcArn));
+
+    Aws::IAM::Model::CreatePolicyOutcome outcome = iam.CreatePolicy(request);
+    Aws::String result;
+    if (!outcome.IsSuccess()) {
+        std::cerr << "Error creating policy " << policyName << ": " <<
+                  outcome.GetError().GetMessage() << std::endl;
+    }
+    else {
+        result = outcome.GetResult().GetPolicy().GetArn();
+        std::cout << "Successfully created policy " << policyName <<
+                  std::endl;
+    }
+
+    return result;
+}
+
+Aws::String AwsDoc::IAM::BuildSamplePolicyDocument(const Aws::String &rsrc_arn) {
+    std::stringstream stringStream;
+    stringStream << "{"
+                 << "  \"Version\": \"2012-10-17\","
+                 << "  \"Statement\": ["
+                 << "    {"
+                 << "        \"Effect\": \"Allow\","
+                 << "        \"Action\": \"logs:CreateLogGroup\","
+                 << "        \"Resource\": \""
+                 << rsrc_arn
+                 << "\""
+                 << "    },"
+                 << "    {"
+                 << "        \"Effect\": \"Allow\","
+                 << "        \"Action\": ["
+                 << "            \"dynamodb:DeleteItem\","
+                 << "            \"dynamodb:GetItem\","
+                 << "            \"dynamodb:PutItem\","
+                 << "            \"dynamodb:Scan\","
+                 << "            \"dynamodb:UpdateItem\""
+                 << "       ],"
+                 << "       \"Resource\": \""
+                 << rsrc_arn
+                 << "\""
+                 << "    }"
+                 << "   ]"
+                 << "}";
+
+    return stringStream.str();
+}
+```
++  For API details, see [CreatePolicy](https://docs.aws.amazon.com/goto/SdkForCpp/iam-2010-05-08/CreatePolicy) in *AWS SDK for C\+\+ API Reference*\. 
 
 ------
 #### [ Go ]
 
 **SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
   
 
 ```
-	// CreatePolicy
+// PolicyWrapper encapsulates AWS Identity and Access Management (IAM) policy actions
+// used in the examples.
+// It contains an IAM service client that is used to perform policy actions.
+type PolicyWrapper struct {
+	IamClient *iam.Client
+}
 
-	fmt.Println("🔐 CreatePolicy")
 
-	policyDocument := `{
-		"Version": "2012-10-17",
-		"Statement": [
-			{
-				"Effect": "Allow",
-				"Action": [
-					"dynamodb:DeleteItem",
-					"dynamodb:GetItem",
-					"dynamodb:PutItem",
-					"dynamodb:Query",
-					"dynamodb:Scan",
-					"dynamodb:UpdateItem"
-				],
-				"Resource": [
-					"arn:aws:dynamodb:us-west-2:123456789012:table/mytable",
-					"arn:aws:dynamodb:us-west-2:123456789012:table/mytable/*"
-				]
-			}
-		]
-	}`
 
-	createPolicyResult, err := service.CreatePolicy(context.Background(), &iam.CreatePolicyInput{
-		PolicyDocument: &policyDocument,
-		PolicyName:     aws.String(ExamplePolicyName),
-	})
-
-	if err != nil {
-		panic("Couldn't create policy!" + err.Error())
+// CreatePolicy creates a policy that grants a list of actions to the specified resource.
+// PolicyDocument shows how to work with a policy document as a data structure and
+// serialize it to JSON by using Go's JSON marshaler.
+func (wrapper PolicyWrapper) CreatePolicy(policyName string, actions []string,
+		resourceArn string) (*types.Policy, error) {
+	var policy *types.Policy
+	policyDoc := PolicyDocument{
+		Version:   "2012-10-17",
+		Statement: []PolicyStatement{{
+			Effect: "Allow",
+			Action: actions,
+			Resource: aws.String(resourceArn),
+		}},
 	}
-
-	fmt.Print("Created a new policy: " + *createPolicyResult.Policy.Arn)
+	policyBytes, err := json.Marshal(policyDoc)
+	if err != nil {
+		log.Printf("Couldn't create policy document for %v. Here's why: %v\n", resourceArn, err)
+		return nil, err
+	}
+	result, err := wrapper.IamClient.CreatePolicy(context.TODO(), &iam.CreatePolicyInput{
+		PolicyDocument: aws.String(string(policyBytes)),
+		PolicyName:     aws.String(policyName),
+	})
+	if err != nil {
+		log.Printf("Couldn't create policy %v. Here's why: %v\n", policyName, err)
+	} else {
+		policy = result.Policy
+	}
+	return policy, err
+}
 ```
 +  For API details, see [CreatePolicy](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.CreatePolicy) in *AWS SDK for Go API Reference*\. 
 
@@ -88,7 +151,7 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 #### [ Java ]
 
 **SDK for Java 2\.x**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javav2/example_code/iam#readme)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javav2/example_code/iam#readme)\. 
   
 
 ```
@@ -126,68 +189,42 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 Create the policy\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { CreatePolicyCommand } from "@aws-sdk/client-iam";
+import { CreatePolicyCommand, IAMClient } from "@aws-sdk/client-iam";
 
-// Set the parameters.
-const myManagedPolicy = {
-  Version: "2012-10-17",
-  Statement: [
-    {
-      Effect: "Allow",
-      Action: "logs:CreateLogGroup",
-      Resource: "RESOURCE_ARN", // RESOURCE_ARN
-    },
-    {
-      Effect: "Allow",
-      Action: [
-        "dynamodb:DeleteItem",
-        "dynamodb:GetItem",
-        "dynamodb:PutItem",
-        "dynamodb:Scan",
-        "dynamodb:UpdateItem",
+const client = new IAMClient({});
+
+/**
+ *
+ * @param {string} policyName
+ */
+export const createPolicy = (policyName) => {
+  const command = new CreatePolicyCommand({
+    PolicyDocument: JSON.stringify({
+      Version: "2012-10-17",
+      Statement: [
+        {
+          Effect: "Allow",
+          Action: "*",
+          Resource: "*",
+        },
       ],
-      Resource: "DYNAMODB_POLICY_NAME", // DYNAMODB_POLICY_NAME; For example, "myDynamoDBName".
-    },
-  ],
-};
-export const params = {
-  PolicyDocument: JSON.stringify(myManagedPolicy),
-  PolicyName: "IAM_POLICY_NAME",
-};
+    }),
+    PolicyName: policyName,
+  });
 
-export const run = async () => {
-  try {
-    const data = await iamClient.send(new CreatePolicyCommand(params));
-    console.log("Success", data);
-    return data;
-  } catch (err) {
-    console.log("Error", err);
-  }
+  return client.send(command);
 };
-run();
 ```
 +  For more information, see [AWS SDK for JavaScript Developer Guide](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/iam-examples-policies.html#iam-examples-policies-creating)\. 
 +  For API details, see [CreatePolicy](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/createpolicycommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
-**SDK for JavaScript V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
+**SDK for JavaScript \(v2\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
   
 
 ```
@@ -242,7 +279,7 @@ iam.createPolicy(params, function(err, data) {
 
 **SDK for Kotlin**  
 This is prerelease documentation for a feature in preview release\. It is subject to change\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
   
 
 ```
@@ -282,12 +319,12 @@ suspend fun createIAMPolicy(policyNameVal: String?): String {
 #### [ PHP ]
 
 **SDK for PHP**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
   
 
 ```
 $uuid = uniqid();
-$service = new IamService();
+$service = new IAMService();
 
 $listAllBucketsPolicyDocument = "{
                 \"Version\": \"2012-10-17\",
@@ -316,7 +353,7 @@ echo "Created policy: {$listAllBucketsPolicy['PolicyName']}\n";
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```
@@ -361,7 +398,7 @@ def create_policy(name, description, actions, resource_arn):
 #### [ Ruby ]
 
 **SDK for Ruby**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
   
 
 ```
@@ -399,7 +436,7 @@ def create_policy(name, description, actions, resource_arn):
 
 **SDK for Rust**  
 This documentation is for an SDK in preview release\. The SDK is subject to change and should not be used in production\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
   
 
 ```
@@ -418,6 +455,33 @@ pub async fn create_policy(
 }
 ```
 +  For API details, see [CreatePolicy](https://docs.rs/releases/search?query=aws-sdk) in *AWS SDK for Rust API reference*\. 
+
+------
+#### [ Swift ]
+
+**SDK for Swift**  
+This is prerelease documentation for an SDK in preview release\. It is subject to change\.
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/swift/example_code/iam#code-examples)\. 
+  
+
+```
+    public func createPolicy(name: String, policyDocument: String) async throws -> IAMClientTypes.Policy {
+        let input = CreatePolicyInput(
+            policyDocument: policyDocument,
+            policyName: name
+        )
+        do {
+            let output = try await iamClient.createPolicy(input: input)
+            guard let policy = output.policy else {
+                throw ServiceHandlerError.noSuchPolicy
+            }
+            return policy
+        } catch {
+            throw error
+        }
+    }
+```
++  For API details, see [CreatePolicy](https://awslabs.github.io/aws-sdk-swift/reference/0.x) in *AWS SDK for Swift API reference*\. 
 
 ------
 

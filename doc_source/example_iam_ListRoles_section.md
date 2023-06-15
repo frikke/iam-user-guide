@@ -9,42 +9,26 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 #### [ \.NET ]
 
 **AWS SDK for \.NET**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
   
 
 ```
-using System;
-using Amazon.IdentityManagement;
-using Amazon.IdentityManagement.Model;
-
-var client = new AmazonIdentityManagementServiceClient();
-
-// Without the MaxItems value, the ListRolesAsync method will
-// return information for up to 100 roles. If there are more
-// than the MaxItems value or more than 100 roles, the response
-// value IsTruncated will be true.
-var request = new ListRolesRequest
-{
-    MaxItems = 10,
-};
-
-var response = new ListRolesResponse();
-
-do
-{
-    response = await client.ListRolesAsync(request);
-    response.Roles.ForEach(role =>
+    /// <summary>
+    /// List IAM roles.
+    /// </summary>
+    /// <returns>A list of IAM roles.</returns>
+    public async Task<List<Role>> ListRolesAsync()
     {
-        Console.WriteLine($"{role.RoleName} - ARN {role.Arn}");
-    });
+        var listRolesPaginator = _IAMService.Paginators.ListRoles(new ListRolesRequest());
+        var roles = new List<Role>();
 
-    // As long as response.IsTruncated is true, set request.Marker equal
-    // to response.Marker and call ListRolesAsync again.
-    if (response.IsTruncated)
-    {
-        request.Marker = response.Marker;
+        await foreach (var response in listRolesPaginator.Responses)
+        {
+            roles.AddRange(response.Roles);
+        }
+
+        return roles;
     }
-} while (response.IsTruncated);
 ```
 +  For API details, see [ListRoles](https://docs.aws.amazon.com/goto/DotNetSDKV3/iam-2010-05-08/ListRoles) in *AWS SDK for \.NET API Reference*\. 
 
@@ -52,71 +36,78 @@ do
 #### [ Go ]
 
 **SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
   
 
 ```
-	// ListRoles
+// RoleWrapper encapsulates AWS Identity and Access Management (IAM) role actions
+// used in the examples.
+// It contains an IAM service client that is used to perform role actions.
+type RoleWrapper struct {
+	IamClient *iam.Client
+}
 
-	roles, err := service.ListRoles(context.Background(), &iam.ListRolesInput{})
 
+
+// ListRoles gets up to maxRoles roles.
+func (wrapper RoleWrapper) ListRoles(maxRoles int32) ([]types.Role, error) {
+	var roles []types.Role
+	result, err := wrapper.IamClient.ListRoles(context.TODO(),
+		&iam.ListRolesInput{MaxItems: aws.Int32(maxRoles)},
+	)
 	if err != nil {
-		panic("Could not list roles: " + err.Error())
+		log.Printf("Couldn't list roles. Here's why: %v\n", err)
+	} else {
+		roles = result.Roles
 	}
-
-	fmt.Println("☑️ list roles")
-	for _, idxRole := range roles.Roles {
-
-		fmt.Printf("%s\t%s\t%s\t",
-			*idxRole.RoleId,
-			*idxRole.RoleName,
-			*idxRole.Arn)
-		if idxRole.Description != nil {
-			fmt.Print(*idxRole.Description)
-		}
-		fmt.Print("\n")
-	}
+	return roles, err
+}
 ```
 +  For API details, see [ListRoles](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.ListRoles) in *AWS SDK for Go API Reference*\. 
 
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 List the roles\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { ListRolesCommand } from "@aws-sdk/client-iam";
+import { ListRolesCommand, IAMClient } from "@aws-sdk/client-iam";
 
-// Set the parameters.
-const params = {
-    Marker: 'MARKER', // This is a string value.
-    MaxItems: 'MAX_ITEMS' // This is a number value.
-};
+const client = new IAMClient({});
 
-const run = async () => {
-        try {
-            const results = await iamClient.send(new ListRolesCommand(params));
-            console.log("Success", results);
-            return results;
-        } catch (err) {
-            console.log("Error", err);
-        }
-};
-run();
+/**
+ * A generator function that handles paginated results.
+ * The AWS SDK for JavaScript (v3) provides {@link https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/index.html#paginators | paginator} functions to simplify this.
+ *
+ */
+export async function* listRoles() {
+  const command = new ListRolesCommand({
+    MaxItems: 10,
+  });
+
+  /**
+   * @type {import("@aws-sdk/client-iam").ListRolesCommandOutput | undefined}
+   */
+  let response = await client.send(command);
+
+  while (response?.Roles?.length) {
+    for (const role of response.Roles) {
+      yield role;
+    }
+
+    if (response.IsTruncated) {
+      response = await client.send(
+        new ListRolesCommand({
+          Marker: response.Marker,
+        })
+      );
+    } else {
+      break;
+    }
+  }
+}
 ```
 +  For API details, see [ListRoles](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/listrolescommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
@@ -124,12 +115,12 @@ run();
 #### [ PHP ]
 
 **SDK for PHP**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
   
 
 ```
 $uuid = uniqid();
-$service = new IamService();
+$service = new IAMService();
 
     /**
      * @param string $pathPrefix
@@ -159,7 +150,7 @@ $service = new IamService();
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```
@@ -185,7 +176,7 @@ def list_roles(count):
 #### [ Ruby ]
 
 **SDK for Ruby**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
   
 
 ```
@@ -214,7 +205,7 @@ def list_roles(count):
 
 **SDK for Rust**  
 This documentation is for an SDK in preview release\. The SDK is subject to change and should not be used in production\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
   
 
 ```
@@ -235,6 +226,41 @@ pub async fn list_roles(
 }
 ```
 +  For API details, see [ListRoles](https://docs.rs/releases/search?query=aws-sdk) in *AWS SDK for Rust API reference*\. 
+
+------
+#### [ Swift ]
+
+**SDK for Swift**  
+This is prerelease documentation for an SDK in preview release\. It is subject to change\.
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/swift/example_code/iam#code-examples)\. 
+  
+
+```
+    public func listRoles() async throws -> [String] {
+        var roleList: [String] = []
+        var marker: String? = nil
+        var isTruncated: Bool
+        
+        repeat {
+            let input = ListRolesInput(marker: marker)
+            let output = try await client.listRoles(input: input)
+            
+            guard let roles = output.roles else {
+                return roleList
+            }
+
+            for role in roles {
+                if let name = role.roleName {
+                    roleList.append(name)
+                }
+            }
+            marker = output.marker
+            isTruncated = output.isTruncated
+        } while isTruncated == true
+        return roleList
+    }
+```
++  For API details, see [ListRoles](https://awslabs.github.io/aws-sdk-swift/reference/0.x) in *AWS SDK for Swift API reference*\. 
 
 ------
 

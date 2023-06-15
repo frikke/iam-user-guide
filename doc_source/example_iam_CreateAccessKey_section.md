@@ -1,6 +1,9 @@
 # Create an IAM access key using an AWS SDK<a name="example_iam_CreateAccessKey_section"></a>
 
-The following code examples show how to create an IAM access key\.
+The following code examples show how to create an IAM access key\. 
+
+**Warning**  
+To avoid security risks, don't use IAM users for authentication when developing purpose\-built software or working with real data\. Instead, use federation with an identity provider such as [AWS IAM Identity Center \(successor to AWS Single Sign\-On\)](https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html)\.
 
 **Note**  
 The source code for these examples is in the [AWS Code Examples GitHub repository](https://github.com/awsdocs/aws-doc-sdk-examples)\. Have feedback on a code example? [Create an Issue](https://github.com/awsdocs/aws-doc-sdk-examples/issues/new/choose) in the code examples repo\. 
@@ -9,104 +12,93 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 #### [ \.NET ]
 
 **AWS SDK for \.NET**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
   
 
 ```
-        /// <summary>
-        /// Create a new AccessKey for the user.
-        /// </summary>
-        /// <param name="client">The initialized IAM client object.</param>
-        /// <param name="userName">The name of the user for whom to create the key.</param>
-        /// <returns>A new IAM access key for the user.</returns>
-        public static async Task<AccessKey> CreateAccessKeyAsync(
-            AmazonIdentityManagementServiceClient client,
-            string userName)
+    /// <summary>
+    /// Create an IAM access key for a user.
+    /// </summary>
+    /// <param name="userName">The username for which to create the IAM access
+    /// key.</param>
+    /// <returns>The AccessKey.</returns>
+    public async Task<AccessKey> CreateAccessKeyAsync(string userName)
+    {
+        var response = await _IAMService.CreateAccessKeyAsync(new CreateAccessKeyRequest
         {
-            var request = new CreateAccessKeyRequest
-            {
-                UserName = userName,
-            };
+            UserName = userName,
+        });
 
-            var response = await client.CreateAccessKeyAsync(request);
+        return response.AccessKey;
 
-            if (response.AccessKey is not null)
-            {
-                Console.WriteLine($"Successfully created Access Key for {userName}.");
-            }
-
-            return response.AccessKey;
-        }
+    }
 ```
 +  For API details, see [CreateAccessKey](https://docs.aws.amazon.com/goto/DotNetSDKV3/iam-2010-05-08/CreateAccessKey) in *AWS SDK for \.NET API Reference*\. 
+
+------
+#### [ C\+\+ ]
+
+**SDK for C\+\+**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/cpp/example_code/iam#code-examples)\. 
+  
+
+```
+Aws::String AwsDoc::IAM::createAccessKey(const Aws::String &userName,
+                                         const Aws::Client::ClientConfiguration &clientConfig) {
+    Aws::IAM::IAMClient iam(clientConfig);
+
+    Aws::IAM::Model::CreateAccessKeyRequest request;
+    request.SetUserName(userName);
+
+    Aws::String result;
+    Aws::IAM::Model::CreateAccessKeyOutcome outcome = iam.CreateAccessKey(request);
+    if (!outcome.IsSuccess()) {
+        std::cerr << "Error creating access key for IAM user " << userName
+                  << ":" << outcome.GetError().GetMessage() << std::endl;
+    }
+    else {
+        const auto &accessKey = outcome.GetResult().GetAccessKey();
+        std::cout << "Successfully created access key for IAM user " <<
+                  userName << std::endl << "  aws_access_key_id = " <<
+                  accessKey.GetAccessKeyId() << std::endl <<
+                  " aws_secret_access_key = " << accessKey.GetSecretAccessKey() <<
+                  std::endl;
+        result = accessKey.GetAccessKeyId();
+    }
+
+    return result;
+}
+```
++  For API details, see [CreateAccessKey](https://docs.aws.amazon.com/goto/SdkForCpp/iam-2010-05-08/CreateAccessKey) in *AWS SDK for C\+\+ API Reference*\. 
 
 ------
 #### [ Go ]
 
 **SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
   
 
 ```
-package main
-
-import (
-	"context"
-	"flag"
-	"fmt"
-
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/iam"
-)
-
-// IMACreateAccessKeyAPI defines the interface for the CreateAccessKey function.
-// We use this interface to test the function using a mocked service.
-type IAMCreateAccessKeyAPI interface {
-	CreateAccessKey(ctx context.Context,
-		params *iam.CreateAccessKeyInput,
-		optFns ...func(*iam.Options)) (*iam.CreateAccessKeyOutput, error)
+// UserWrapper encapsulates user actions used in the examples.
+// It contains an IAM service client that is used to perform user actions.
+type UserWrapper struct {
+	IamClient *iam.Client
 }
 
-// MakeAccessKey creates a new AWS Identity and Access Management (IAM) access key for a user.
-// Inputs:
-//     c is the context of the method call, which includes the AWS Region.
-//     api is the interface that defines the method call.
-//     input defines the input arguments to the service call.
-// Output:
-//     If successful, a CreateAccessKeyOutput object containing the result of the service call and nil.
-//     Otherwise, nil and an error from the call to CreateAccessKey.
-func MakeAccessKey(c context.Context, api IAMCreateAccessKeyAPI, input *iam.CreateAccessKeyInput) (*iam.CreateAccessKeyOutput, error) {
-	return api.CreateAccessKey(c, input)
-}
 
-func main() {
-	userName := flag.String("u", "", "The name of the user")
-	flag.Parse()
 
-	if *userName == "" {
-		fmt.Println("You must supply a user name (-u USER)")
-		return
-	}
-
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+// CreateAccessKeyPair creates an access key for a user. The returned access key contains
+// the ID and secret credentials needed to use the key.
+func (wrapper UserWrapper) CreateAccessKeyPair(userName string) (*types.AccessKey, error) {
+	var key *types.AccessKey
+	result, err := wrapper.IamClient.CreateAccessKey(context.TODO(), &iam.CreateAccessKeyInput{
+		UserName: aws.String(userName)})
 	if err != nil {
-		panic("configuration error, " + err.Error())
+		log.Printf("Couldn't create access key pair for user %v. Here's why: %v\n", userName, err)
+	} else {
+		key = result.AccessKey
 	}
-
-	client := iam.NewFromConfig(cfg)
-
-	input := &iam.CreateAccessKeyInput{
-		UserName: userName,
-	}
-
-	result, err := MakeAccessKey(context.TODO(), client, input)
-	if err != nil {
-		fmt.Println("Got an error creating a new access key")
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println("Created new access key with ID: " + *result.AccessKey.AccessKeyId + " and secret key: " + *result.AccessKey.SecretAccessKey)
+	return key, err
 }
 ```
 +  For API details, see [CreateAccessKey](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.CreateAccessKey) in *AWS SDK for Go API Reference*\. 
@@ -115,7 +107,7 @@ func main() {
 #### [ Java ]
 
 **SDK for Java 2\.x**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javav2/example_code/iam#readme)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javav2/example_code/iam#readme)\. 
   
 
 ```
@@ -141,44 +133,29 @@ func main() {
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 Create the access key\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { CreateAccessKeyCommand } from "@aws-sdk/client-iam";
+import { CreateAccessKeyCommand, IAMClient } from "@aws-sdk/client-iam";
 
-// Set the parameters.
-export const params = {UserName: "IAM_USER_NAME"}; //IAM_USER_NAME
+const client = new IAMClient({});
 
-export const run = async () => {
-  try {
-    const data = await iamClient.send(new CreateAccessKeyCommand(params));
-    console.log("Success", data);
-    return data;
-  } catch (err) {
-    console.log("Error", err);
-  }
+/**
+ *
+ * @param {string} userName
+ */
+export const createAccessKey = (userName) => {
+  const command = new CreateAccessKeyCommand({ UserName: userName });
+  return client.send(command);
 };
-run();
 ```
 +  For more information, see [AWS SDK for JavaScript Developer Guide](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/iam-examples-managing-access-keys.html#iam-examples-managing-access-keys-creating)\. 
 +  For API details, see [CreateAccessKey](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/createaccesskeycommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
-**SDK for JavaScript V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
+**SDK for JavaScript \(v2\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
   
 
 ```
@@ -206,7 +183,7 @@ iam.createAccessKey({UserName: 'IAM_USER_NAME'}, function(err, data) {
 
 **SDK for Kotlin**  
 This is prerelease documentation for a feature in preview release\. It is subject to change\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
   
 
 ```
@@ -228,7 +205,7 @@ suspend fun createIAMAccessKey(user: String?): String {
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```
@@ -257,7 +234,7 @@ def create_key(user_name):
 #### [ Ruby ]
 
 **SDK for Ruby**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
   
 
 ```
@@ -283,7 +260,7 @@ def create_key(user_name):
 
 **SDK for Rust**  
 This documentation is for an SDK in preview release\. The SDK is subject to change and should not be used in production\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
   
 
 ```
@@ -310,6 +287,32 @@ pub async fn create_access_key(client: &iamClient, user_name: &str) -> Result<Ac
 }
 ```
 +  For API details, see [CreateAccessKey](https://docs.rs/releases/search?query=aws-sdk) in *AWS SDK for Rust API reference*\. 
+
+------
+#### [ Swift ]
+
+**SDK for Swift**  
+This is prerelease documentation for an SDK in preview release\. It is subject to change\.
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/swift/example_code/iam#code-examples)\. 
+  
+
+```
+    public func createAccessKey(userName: String) async throws -> IAMClientTypes.AccessKey {
+        let input = CreateAccessKeyInput(
+            userName: userName
+        )
+        do {
+            let output = try await iamClient.createAccessKey(input: input)
+            guard let accessKey = output.accessKey else {
+                throw ServiceHandlerError.keyError
+            }
+            return accessKey
+        } catch {
+            throw error
+        }
+    }
+```
++  For API details, see [CreateAccessKey](https://awslabs.github.io/aws-sdk-swift/reference/0.x) in *AWS SDK for Swift API reference*\. 
 
 ------
 

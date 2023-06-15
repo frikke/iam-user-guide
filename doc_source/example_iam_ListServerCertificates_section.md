@@ -1,48 +1,109 @@
 # List IAM server certificates using an AWS SDK<a name="example_iam_ListServerCertificates_section"></a>
 
-The following code example shows how to list IAM server certificates\.
+The following code examples show how to list IAM server certificates\.
 
 **Note**  
 The source code for these examples is in the [AWS Code Examples GitHub repository](https://github.com/awsdocs/aws-doc-sdk-examples)\. Have feedback on a code example? [Create an Issue](https://github.com/awsdocs/aws-doc-sdk-examples/issues/new/choose) in the code examples repo\. 
 
 ------
+#### [ C\+\+ ]
+
+**SDK for C\+\+**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/cpp/example_code/iam#code-examples)\. 
+  
+
+```
+bool AwsDoc::IAM::listServerCertificates(
+        const Aws::Client::ClientConfiguration &clientConfig) {
+    const Aws::String DATE_FORMAT = "%Y-%m-%d";
+
+    Aws::IAM::IAMClient iam(clientConfig);
+    Aws::IAM::Model::ListServerCertificatesRequest request;
+
+    bool done = false;
+    bool header = false;
+    while (!done) {
+        auto outcome = iam.ListServerCertificates(request);
+        if (!outcome.IsSuccess()) {
+            std::cerr << "Failed to list server certificates: " <<
+                      outcome.GetError().GetMessage() << std::endl;
+            return false;
+        }
+
+        if (!header) {
+            std::cout << std::left << std::setw(55) << "Name" <<
+                      std::setw(30) << "ID" << std::setw(80) << "Arn" <<
+                      std::setw(14) << "UploadDate" << std::setw(14) <<
+                      "ExpirationDate" << std::endl;
+            header = true;
+        }
+
+        const auto &certificates =
+                outcome.GetResult().GetServerCertificateMetadataList();
+
+        for (const auto &certificate: certificates) {
+            std::cout << std::left << std::setw(55) <<
+                      certificate.GetServerCertificateName() << std::setw(30) <<
+                      certificate.GetServerCertificateId() << std::setw(80) <<
+                      certificate.GetArn() << std::setw(14) <<
+                      certificate.GetUploadDate().ToGmtString(DATE_FORMAT.c_str()) <<
+                      std::setw(14) <<
+                      certificate.GetExpiration().ToGmtString(DATE_FORMAT.c_str()) <<
+                      std::endl;
+        }
+
+        if (outcome.GetResult().GetIsTruncated()) {
+            request.SetMarker(outcome.GetResult().GetMarker());
+        }
+        else {
+            done = true;
+        }
+    }
+
+    return true;
+}
+```
++  For API details, see [ListServerCertificates](https://docs.aws.amazon.com/goto/SdkForCpp/iam-2010-05-08/ListServerCertificates) in *AWS SDK for C\+\+ API Reference*\. 
+
+------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 List the certificates\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { ListServerCertificatesCommand } from "@aws-sdk/client-iam";
+import { ListServerCertificatesCommand, IAMClient } from "@aws-sdk/client-iam";
 
-export const run = async () => {
-  try {
-    const data = await iamClient.send(new ListServerCertificatesCommand({}));
-    console.log("Success", data);
-    return data;
-  } catch (err) {
-    console.log("Error", err);
+const client = new IAMClient({});
+
+/**
+ * A generator function that handles paginated results.
+ * The AWS SDK for JavaScript (v3) provides {@link https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/index.html#paginators | paginator} functions to simplify this.
+ *
+ */
+export async function* listServerCertificates() {
+  const command = new ListServerCertificatesCommand({});
+  let response = await client.send(command);
+
+  while (response.ServerCertificateMetadataList?.length) {
+    for await (const cert of response.ServerCertificateMetadataList) {
+      yield cert;
+    }
+
+    if (response.IsTruncated) {
+      response = await client.send(new ListServerCertificatesCommand({}));
+    } else {
+      break;
+    }
   }
-};
-run();
+}
 ```
 +  For more information, see [AWS SDK for JavaScript Developer Guide](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/iam-examples-server-certificates.html#iam-examples-server-certificates-listing)\. 
 +  For API details, see [ListServerCertificates](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/listservercertificatescommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
-**SDK for JavaScript V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
+**SDK for JavaScript \(v2\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
   
 
 ```

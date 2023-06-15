@@ -9,27 +9,19 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 #### [ \.NET ]
 
 **AWS SDK for \.NET**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
   
 
 ```
-using System;
-using Amazon.IdentityManagement;
-using Amazon.IdentityManagement.Model;
-
-var client = new AmazonIdentityManagementServiceClient();
-
-try
-{
-    var request = new GetAccountPasswordPolicyRequest();
-    var response = await client.GetAccountPasswordPolicyAsync(request);
-
-    Console.WriteLine($"{response.PasswordPolicy}");
-}
-catch (NoSuchEntityException ex)
-{
-    Console.WriteLine($"Error: {ex.Message}");
-}
+    /// <summary>
+    /// Gets the IAM password policy for an AWS account.
+    /// </summary>
+    /// <returns>The PasswordPolicy for the AWS account.</returns>
+    public async Task<PasswordPolicy> GetAccountPasswordPolicyAsync()
+    {
+        var response = await _IAMService.GetAccountPasswordPolicyAsync(new GetAccountPasswordPolicyRequest());
+        return response.PasswordPolicy;
+    }
 ```
 +  For API details, see [GetAccountPasswordPolicy](https://docs.aws.amazon.com/goto/DotNetSDKV3/iam-2010-05-08/GetAccountPasswordPolicy) in *AWS SDK for \.NET API Reference*\. 
 
@@ -37,62 +29,57 @@ catch (NoSuchEntityException ex)
 #### [ Go ]
 
 **SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
   
 
 ```
-	// GetAccountPasswordPolicy
+// AccountWrapper encapsulates AWS Identity and Access Management (IAM) account actions
+// used in the examples.
+// It contains an IAM service client that is used to perform account actions.
+type AccountWrapper struct {
+	IamClient *iam.Client
+}
 
-	fmt.Println("🔐 GetAccountPasswordPolicy")
 
-	accountPasswordPolicy, err := service.GetAccountPasswordPolicy(context.Background(), &iam.GetAccountPasswordPolicyInput{})
 
+// GetAccountPasswordPolicy gets the account password policy for the current account.
+// If no policy has been set, a NoSuchEntityException is error is returned.
+func (wrapper AccountWrapper) GetAccountPasswordPolicy() (*types.PasswordPolicy, error) {
+	var pwPolicy *types.PasswordPolicy
+	result, err := wrapper.IamClient.GetAccountPasswordPolicy(context.TODO(),
+		&iam.GetAccountPasswordPolicyInput{})
 	if err != nil {
-		var notexists *types.NoSuchEntityException
-		if errors.As(err, &notexists) {
-			fmt.Println("No password policy")
-		} else {
-			panic("Couldn't get account password policy! " + err.Error())
-		}
+		log.Printf("Couldn't get account password policy. Here's why: %v\n", err)
 	} else {
-		fmt.Println("Users can change password: ", accountPasswordPolicy.PasswordPolicy.AllowUsersToChangePassword)
-		fmt.Println("Passwords expire: ", accountPasswordPolicy.PasswordPolicy.ExpirePasswords)
-		fmt.Println("Minimum password length: ", accountPasswordPolicy.PasswordPolicy.MinimumPasswordLength)
+		pwPolicy = result.PasswordPolicy
 	}
+	return pwPolicy, err
+}
 ```
 +  For API details, see [GetAccountPasswordPolicy](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.GetAccountPasswordPolicy) in *AWS SDK for Go API Reference*\. 
 
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 Get the account password policy\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { GetAccountPasswordPolicyCommand } from "@aws-sdk/client-iam";
+import {
+  GetAccountPasswordPolicyCommand,
+  IAMClient,
+} from "@aws-sdk/client-iam";
 
-const run = async () => {
-  try {
-    const data = await iamClient.send(new GetAccountPasswordPolicyCommand({}));
-    console.log("Success", data.PasswordPolicy);
-  } catch (err) {
-    console.log("Error", err);
-  }
+const client = new IAMClient({});
+
+export const getAccountPasswordPolicy = async () => {
+  const command = new GetAccountPasswordPolicyCommand({});
+
+  const response = await client.send(command);
+  console.log(response.PasswordPolicy);
+  return response;
 };
-run();
 ```
 +  For API details, see [GetAccountPasswordPolicy](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/getaccountpasswordpolicycommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
@@ -100,12 +87,12 @@ run();
 #### [ PHP ]
 
 **SDK for PHP**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
   
 
 ```
 $uuid = uniqid();
-$service = new IamService();
+$service = new IAMService();
 
     public function getAccountPasswordPolicy()
     {
@@ -118,7 +105,7 @@ $service = new IamService();
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```
@@ -155,7 +142,7 @@ def print_password_policy():
 #### [ Ruby ]
 
 **SDK for Ruby**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
   
 
 ```
@@ -182,7 +169,7 @@ def print_password_policy():
 
 **SDK for Rust**  
 This documentation is for an SDK in preview release\. The SDK is subject to change and should not be used in production\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
   
 
 ```

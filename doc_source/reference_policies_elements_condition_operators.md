@@ -253,9 +253,9 @@ The `aws:SourceIp` condition key resolves to the IP address that the request ori
 
 If the key that you specify in a policy condition is not present in the request context, the values do not match\. The `aws:SourceIp` key is always present in the request context, except when the requester uses a VPC endpoint to make the request\. In this case, the condition returns `false` and the request is implicitly denied by this statement\.
 
-You can not use a [policy variable](reference_policies_variables.md) with the `IP Address` condition operator\.
+You can not use a [policy variable](reference_policies_variables.md) with the `IpAddress` condition operator\.
 
-The following example shows how to mix IPv4 and IPv6 addresses to cover all of your organization's valid IP addresses\. We recommend that you augment your organization's policies with your IPv6 address ranges in addition to IPv4 ranges you already have to ensure the policies continue to work as you make the transition to IPv6\.
+The following example shows how to mix IPv4 and IPv6 addresses to cover all of your organization's valid IP addresses\. We recommend that you update your organization's policies with your IPv6 address ranges in addition to IPv4 ranges you already have to ensure the policies continue to work as you make the transition to IPv6\.
 
 ```
 {
@@ -352,7 +352,9 @@ For example, consider the following policy example:
 }
 ```
 
-The *intent* of the preceding policy is to enable the user to launch any instance that is type t1, t2 or m3\. However, launching an instance actually requires accessing many resources in addition to the instance itself; for example, images, key pairs, security groups, etc\. The entire statement is evaluated against every resource that is required to launch the instance\. These additional resources do not have the `ec2:InstanceType` condition key, so the `StringLike` check fails, and the user is not granted the ability to launch *any* instance type\. To address this, use the `StringLikeIfExists` condition operator instead\. This way, the test only happens if the condition key exists\. You could read the following as: "If the resource being checked has an "`ec2:InstanceType`" condition key, then allow the action only if the key value begins with "t1\.\*", "t2\.\*", or "m3\.\*"\. If the resource being checked does not have that condition key, then don't worry about it\." The `DescribeActions` statement includes the actions required to view the instance in the console\.
+The *intent* of the preceding policy is to enable the user to launch any instance that is type `t1`, `t2` or `m3`\. However, launching an instance requires accessing many resources in addition to the instance itself; for example, images, key pairs, security groups, and more\. The entire statement is evaluated against every resource that is required to launch the instance\. These additional resources do not have the `ec2:InstanceType` condition key, so the `StringLike` check fails, and the user is not granted the ability to launch *any* instance type\. 
+
+To address this, use the `StringLikeIfExists` condition operator instead\. This way, the test only happens if the condition key exists\. You could read the following policy as: "If the resource being checked has an "`ec2:InstanceType`" condition key, then allow the action only if the key value begins with `t1.`, `t2.`, or `m3.`\. If the resource being checked does not have that condition key, then don't worry about it\." The asterisk \(\*\) in the condition key values, when used with the `StringLikeIfExists` condition operator, is interpreted as a wildcard to achieve partial string matches\. The `DescribeActions` statement includes the actions required to view the instance in the console\.
 
 ```
 {

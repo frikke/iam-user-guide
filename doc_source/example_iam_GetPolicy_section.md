@@ -9,93 +9,120 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 #### [ \.NET ]
 
 **AWS SDK for \.NET**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
   
 
 ```
-using System;
-using Amazon.IdentityManagement;
-using Amazon.IdentityManagement.Model;
+    /// <summary>
+    /// Get information about an IAM policy.
+    /// </summary>
+    /// <param name="policyArn">The IAM policy to retrieve information for.</param>
+    /// <returns>The IAM policy.</returns>
+    public async Task<ManagedPolicy> GetPolicyAsync(string policyArn)
+    {
 
-var client = new AmazonIdentityManagementServiceClient();
-var request = new GetPolicyRequest
-{
-    PolicyArn = "POLICY_ARN",
-};
-
-var response = await client.GetPolicyAsync(request);
-
-Console.Write($"{response.Policy.PolicyName} was created on ");
-Console.WriteLine($"{response.Policy.CreateDate}");
+        var response = await _IAMService.GetPolicyAsync(new GetPolicyRequest { PolicyArn = policyArn });
+        return response.Policy;
+    }
 ```
 +  For API details, see [GetPolicy](https://docs.aws.amazon.com/goto/DotNetSDKV3/iam-2010-05-08/GetPolicy) in *AWS SDK for \.NET API Reference*\. 
+
+------
+#### [ C\+\+ ]
+
+**SDK for C\+\+**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/cpp/example_code/iam#code-examples)\. 
+  
+
+```
+bool AwsDoc::IAM::getPolicy(const Aws::String &policyArn,
+                            const Aws::Client::ClientConfiguration &clientConfig) {
+    Aws::IAM::IAMClient iam(clientConfig);
+    Aws::IAM::Model::GetPolicyRequest request;
+    request.SetPolicyArn(policyArn);
+
+    auto outcome = iam.GetPolicy(request);
+    if (!outcome.IsSuccess()) {
+        std::cerr << "Error getting policy " << policyArn << ": " <<
+                  outcome.GetError().GetMessage() << std::endl;
+    }
+    else {
+        const auto &policy = outcome.GetResult().GetPolicy();
+        std::cout << "Name: " << policy.GetPolicyName() << std::endl <<
+                  "ID: " << policy.GetPolicyId() << std::endl << "Arn: " <<
+                  policy.GetArn() << std::endl << "Description: " <<
+                  policy.GetDescription() << std::endl << "CreateDate: " <<
+                  policy.GetCreateDate().ToGmtString(Aws::Utils::DateFormat::ISO_8601)
+                  << std::endl;
+    }
+
+    return outcome.IsSuccess();
+}
+```
++  For API details, see [GetPolicy](https://docs.aws.amazon.com/goto/SdkForCpp/iam-2010-05-08/GetPolicy) in *AWS SDK for C\+\+ API Reference*\. 
 
 ------
 #### [ Go ]
 
 **SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
   
 
 ```
-	// GetPolicy
+// PolicyWrapper encapsulates AWS Identity and Access Management (IAM) policy actions
+// used in the examples.
+// It contains an IAM service client that is used to perform policy actions.
+type PolicyWrapper struct {
+	IamClient *iam.Client
+}
 
-	getPolicyResponse, err := service.GetPolicy(context.Background(), &iam.GetPolicyInput{
-		PolicyArn: policyArn,
+
+
+// GetPolicy gets data about a policy.
+func (wrapper PolicyWrapper) GetPolicy(policyArn string) (*types.Policy, error) {
+	var policy *types.Policy
+	result, err := wrapper.IamClient.GetPolicy(context.TODO(), &iam.GetPolicyInput{
+		PolicyArn: aws.String(policyArn),
 	})
-
 	if err != nil {
-		panic("Couldn't get policy from ARN: " + err.Error())
+		log.Printf("Couldn't get policy %v. Here's why: %v\n", policyArn, err)
+	} else {
+		policy = result.Policy
 	}
-
-	fmt.Printf("policy: %s, name %s\n",
-		*getPolicyResponse.Policy.Arn,
-		*getPolicyResponse.Policy.PolicyName)
+	return policy, err
+}
 ```
 +  For API details, see [GetPolicy](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.GetPolicy) in *AWS SDK for Go API Reference*\. 
 
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 Get the policy\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { GetPolicyCommand } from "@aws-sdk/client-iam";
+import { GetPolicyCommand, IAMClient } from "@aws-sdk/client-iam";
 
-// Set the parameters.
-const params = {
-  PolicyArn: "POLICY_ARN" /* required */,
-};
+const client = new IAMClient({});
 
-const run = async () => {
-  try {
-    const data = await iamClient.send(new GetPolicyCommand(params));
-    console.log("Success", data.Policy);
-  } catch (err) {
-    console.log("Error", err);
-  }
+/**
+ *
+ * @param {string} policyArn
+ */
+export const getPolicy = (policyArn) => {
+  const command = new GetPolicyCommand({
+    PolicyArn: policyArn,
+  });
+
+  return client.send(command);
 };
-run();
 ```
 +  For more information, see [AWS SDK for JavaScript Developer Guide](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/iam-examples-policies.html#iam-examples-policies-getting)\. 
 +  For API details, see [GetPolicy](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/getpolicycommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
-**SDK for JavaScript V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
+**SDK for JavaScript \(v2\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
   
 
 ```
@@ -127,7 +154,7 @@ iam.getPolicy(params, function(err, data) {
 
 **SDK for Kotlin**  
 This is prerelease documentation for a feature in preview release\. It is subject to change\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
   
 
 ```
@@ -149,12 +176,12 @@ suspend fun getIAMPolicy(policyArnVal: String?) {
 #### [ PHP ]
 
 **SDK for PHP**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
   
 
 ```
 $uuid = uniqid();
-$service = new IamService();
+$service = new IAMService();
 
     public function getPolicy($policyArn)
     {
@@ -169,7 +196,7 @@ $service = new IamService();
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```
@@ -199,7 +226,7 @@ def get_default_policy_statement(policy_arn):
 #### [ Ruby ]
 
 **SDK for Ruby**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
   
 
 ```
@@ -219,6 +246,32 @@ def get_default_policy_statement(policy_arn):
   end
 ```
 +  For API details, see [GetPolicy](https://docs.aws.amazon.com/goto/SdkForRubyV3/iam-2010-05-08/GetPolicy) in *AWS SDK for Ruby API Reference*\. 
+
+------
+#### [ Swift ]
+
+**SDK for Swift**  
+This is prerelease documentation for an SDK in preview release\. It is subject to change\.
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/swift/example_code/iam#code-examples)\. 
+  
+
+```
+    public func getPolicy(arn: String) async throws -> IAMClientTypes.Policy {
+        let input = GetPolicyInput(
+            policyArn: arn
+        )
+        do {
+            let output = try await client.getPolicy(input: input)
+            guard let policy = output.policy else {
+                throw ServiceHandlerError.noSuchPolicy
+            }
+            return policy
+        } catch {
+            throw error
+        }
+    }
+```
++  For API details, see [GetPolicy](https://awslabs.github.io/aws-sdk-swift/reference/0.x) in *AWS SDK for Swift API reference*\. 
 
 ------
 

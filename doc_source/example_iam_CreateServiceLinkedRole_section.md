@@ -6,68 +6,96 @@ The following code examples show how to create an IAM service\-linked role\.
 The source code for these examples is in the [AWS Code Examples GitHub repository](https://github.com/awsdocs/aws-doc-sdk-examples)\. Have feedback on a code example? [Create an Issue](https://github.com/awsdocs/aws-doc-sdk-examples/issues/new/choose) in the code examples repo\. 
 
 ------
-#### [ Go ]
+#### [ \.NET ]
 
-**SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+**AWS SDK for \.NET**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
   
 
 ```
-	// CreateServiceLinkedRole
+    /// <summary>
+    /// Create an IAM service-linked role.
+    /// </summary>
+    /// <param name="serviceName">The name of the AWS Service.</param>
+    /// <param name="description">A description of the IAM service-linked role.</param>
+    /// <returns>The IAM role that was created.</returns>
+    public async Task<Role> CreateServiceLinkedRoleAsync(string serviceName, string description)
+    {
+        var request = new CreateServiceLinkedRoleRequest
+        {
+            AWSServiceName = serviceName,
+            Description = description
+        };
 
-	fmt.Println("➡️ Create SLR for " + ExampleSLRService)
-	createSlrResult, err := service.CreateServiceLinkedRole(context.Background(), &iam.CreateServiceLinkedRoleInput{
-		AWSServiceName: aws.String(ExampleSLRService),
-		Description:    aws.String(ExampleSLRDescription),
+        var response = await _IAMService.CreateServiceLinkedRoleAsync(request);
+        return response.Role;
+    }
+```
++  For API details, see [CreateServiceLinkedRole](https://docs.aws.amazon.com/goto/DotNetSDKV3/iam-2010-05-08/CreateServiceLinkedRole) in *AWS SDK for \.NET API Reference*\. 
+
+------
+#### [ Go ]
+
+**SDK for Go V2**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+  
+
+```
+// RoleWrapper encapsulates AWS Identity and Access Management (IAM) role actions
+// used in the examples.
+// It contains an IAM service client that is used to perform role actions.
+type RoleWrapper struct {
+	IamClient *iam.Client
+}
+
+
+
+// CreateServiceLinkedRole creates a service-linked role that is owned by the specified service.
+func (wrapper RoleWrapper) CreateServiceLinkedRole(serviceName string, description string) (*types.Role, error) {
+	var role *types.Role
+	result, err := wrapper.IamClient.CreateServiceLinkedRole(context.TODO(), &iam.CreateServiceLinkedRoleInput{
+		AWSServiceName: aws.String(serviceName),
+		Description:    aws.String(description),
 	})
-
-	// NOTE: We don't consider this an error as running this example multiple times will cause an error.
 	if err != nil {
-		fmt.Printf("Couldn't create service-linked role: %v\n", err.Error())
+		log.Printf("Couldn't create service-linked role %v. Here's why: %v\n", serviceName, err)
 	} else {
-
-		fmt.Printf("Created service-linked role with ARN: %s\n", *createSlrResult.Role.Arn)
+		role = result.Role
 	}
+	return role, err
+}
 ```
 +  For API details, see [CreateServiceLinkedRole](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.CreateServiceLinkedRole) in *AWS SDK for Go API Reference*\. 
 
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 Create a service\-linked role\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { CreateServiceLinkedRoleCommand } from "@aws-sdk/client-iam";
-// Set the parameters.
-const params = {
-  AWSServiceName: "AWS_SERVICE_NAME" /* required */,
-};
+import { CreateServiceLinkedRoleCommand, IAMClient } from "@aws-sdk/client-iam";
 
-const run = async () => {
-  try {
-    const data = await iamClient.send(
-      new CreateServiceLinkedRoleCommand(params)
-    );
-    console.log("Success", data);
-  } catch (err) {
-    console.log("Error", err);
-  }
+const client = new IAMClient({});
+
+/**
+ *
+ * @param {string} serviceName
+ */
+export const createServiceLinkedRole = async (serviceName) => {
+  const command = new CreateServiceLinkedRoleCommand({
+    // For a list of AWS services that support service-linked roles,
+    // see https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_aws-services-that-work-with-iam.html.
+    // 
+    // For a list of AWS service endpoints, see https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html.
+    AWSServiceName: serviceName,
+  });
+
+  const response = await client.send(command);
+  console.log(response);
+  return response;
 };
-run();
 ```
 +  For API details, see [CreateServiceLinkedRole](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/createservicelinkedrolecommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
@@ -75,12 +103,12 @@ run();
 #### [ PHP ]
 
 **SDK for PHP**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
   
 
 ```
 $uuid = uniqid();
-$service = new IamService();
+$service = new IAMService();
 
     public function createServiceLinkedRole($awsServiceName, $customSuffix = "", $description = "")
     {
@@ -100,7 +128,7 @@ $service = new IamService();
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```
@@ -129,7 +157,7 @@ def create_service_linked_role(service_name, description):
 #### [ Ruby ]
 
 **SDK for Ruby**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
   
 
 ```
@@ -158,7 +186,7 @@ def create_service_linked_role(service_name, description):
 
 **SDK for Rust**  
 This documentation is for an SDK in preview release\. The SDK is subject to change and should not be used in production\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
   
 
 ```
@@ -180,6 +208,35 @@ pub async fn create_service_linked_role(
 }
 ```
 +  For API details, see [CreateServiceLinkedRole](https://docs.rs/releases/search?query=aws-sdk) in *AWS SDK for Rust API reference*\. 
+
+------
+#### [ Swift ]
+
+**SDK for Swift**  
+This is prerelease documentation for an SDK in preview release\. It is subject to change\.
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/swift/example_code/iam#code-examples)\. 
+  
+
+```
+    public func createServiceLinkedRole(service: String, suffix: String? = nil, description: String?)
+                    async throws -> IAMClientTypes.Role {
+        let input = CreateServiceLinkedRoleInput(
+            awsServiceName: service,
+            customSuffix: suffix,
+            description: description
+        )
+        do {
+            let output = try await client.createServiceLinkedRole(input: input)
+            guard let role = output.role else {
+                throw ServiceHandlerError.noSuchRole
+            }
+            return role
+        } catch {
+            throw error
+        }
+    }
+```
++  For API details, see [CreateServiceLinkedRole](https://awslabs.github.io/aws-sdk-swift/reference/0.x) in *AWS SDK for Swift API reference*\. 
 
 ------
 

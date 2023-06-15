@@ -27,17 +27,20 @@ For example, you can use AWS CloudFormation to read and write from an Amazon Dyn
 + **Availability** – This key is present in the request when a service that supports `aws:CalledVia` uses the credentials of an IAM principal to make a request to another service\. This key is not present if the service uses a [service role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_terms-and-concepts.html#iam-term-service-role) or [service\-linked role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_terms-and-concepts.html#iam-term-service-linked-role) to make a call on the principal's behalf\. This key is also not present when the principal makes the call directly\.
 + **Value type** – Multivalued<a name="calledvia-services"></a>
 
-To use the `aws:CalledVia` condition key in a policy, you must provide the service principals to allow or deny AWS service requests\. AWS supports using the following services with `aws:CalledVia`\.
+To use the `aws:CalledVia` condition key in a policy, you must provide the service principals to allow or deny AWS service requests\. AWS supports using the following service principals with `aws:CalledVia`\.
 
 
-**CalledVia services**  
-
-| AWS service | Service principal | 
-| --- | --- | 
-| Amazon Athena | athena\.amazonaws\.com | 
-| AWS CloudFormation | cloudformation\.amazonaws\.com | 
-| Amazon DynamoDB | dynamodb\.amazonaws\.com | 
-| AWS Key Management Service \(AWS KMS\) | kms\.amazonaws\.com | 
+| Service principal | 
+| --- | 
+| athena\.amazonaws\.com | 
+| cloud9\.amazonaws\.com | 
+| cloudformation\.amazonaws\.com | 
+| databrew\.amazonaws\.com | 
+| dataexchange\.amazonaws\.com | 
+| dynamodb\.amazonaws\.com | 
+| kms\.amazonaws\.com | 
+| servicecatalog\-appregistry\.amazonaws\.com | 
+| sqlworkbench\.amazonaws\.com | 
 
 To allow or deny access when *any* service makes a request using the principal's credentials, use the `aws:ViaAWSService` condition key\. That condition key supports AWS services\.
 
@@ -129,6 +132,102 @@ Works with [date operators](reference_policies_elements_condition_operators.md#C
 Use this key to compare the date and time of the request with the date and time that you specify in the policy\. To view an example policy that uses this condition key, see [AWS: Allows access based on date and time](reference_policies_examples_aws-dates.md)\.
 + **Availability** – This key is always included in the request context\.
 + **Value type** – Single\-valued
+
+## aws:Ec2InstanceSourceVpc<a name="condition-keys-ec2instancesourcevpc"></a>
+
+Works with [string operators](reference_policies_elements_condition_operators.md#Conditions_String)\.
+
+This key identifies the VPC to which Amazon EC2 IAM role credentials were delivered to\. You can use this key in a policy with the [`aws:SourceVPC`](#condition-keys-sourcevpc) global key to check if a call is made from a VPC \(`aws:SourceVPC`\) that matches the VPC where a credential was delivered to \(`aws:Ec2InstanceSourceVpc`\)\.
++ **Availability** – This key is included in the request context whenever the requester is signing requests with an Amazon EC2 role credential\. It can be used in IAM policies, service control policies, VPC endpoint policies, and resource policies\.
++ **Value type** – Single\-valued
+
+This key can be used with VPC identifier values, but is most useful when used as a variable combined with the `aws:SourceVpc` context key\. The `aws:SourceVpc` context key is included in the request context only if the requester uses a VPC endpoint to make the request\. Using `aws:Ec2InstanceSourceVpc` with `aws:SourceVpc` allows you to use `aws:Ec2InstanceSourceVpc` more broadly since it compares values that typically change together\.
+
+**Note**  
+This condition key is not available in EC2\-Classic\.
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "RequireSameVPC",
+      "Effect": "Deny",
+      "Action": "*",
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+            "aws:SourceVpc": "${aws:Ec2InstanceSourceVpc}"
+        },
+        "Null": {
+          "ec2:SourceInstanceARN": "false"
+        },
+        "BoolIfExists": {
+          "aws:ViaAWSService": "false"
+        }
+      }
+    }
+  ]
+}
+```
+
+In the example above, access is denied if the `aws:SourceVpc` value isn’t equal to the `aws:Ec2InstanceSourceVpc` value\. The policy statement is limited to only roles used as Amazon EC2 instance roles by testing for the existence of the `ec2:SourceInstanceARN` condition key\.
+
+The policy uses `aws:ViaAWSService` to allow AWS to authorize requests when requests are made on behalf of your Amazon EC2 instance roles\. For example, when you make a request from an Amazon EC2 instance to an encrypted Amazon S3 bucket, Amazon S3 makes a call to AWS KMS on your behalf\. Some of the keys are not present when the request is made to AWS KMS\.
+
+## aws:Ec2InstanceSourcePrivateIPv4<a name="condition-keys-ec2instancesourceprivateip4"></a>
+
+Works with [IP address operators](reference_policies_elements_condition_operators.md#Conditions_IPAddress)\.
+
+This key identifies the private IPv4 address of the primary elastic network interface to which Amazon EC2 IAM role credentials were delivered\. You must use this condition key with its companion key `aws:Ec2InstanceSourceVpc` to ensure that you have a globally unique combination of VPC ID and source private IP\. Use this key with `aws:Ec2InstanceSourceVpc` to ensure that a request was made from the same private IP address that the credentials were delivered to\.
++ **Availability** – This key is included in the request context whenever the requester is signing requests with an Amazon EC2 role credential\. It can be used in IAM policies, service control policies, VPC endpoint policies, and resource policies\.
++ **Value type** – Single\-valued
+
+**Important**  
+This key should not be used alone in an `Allow` statement\. Private IP addresses are by definition not globally unique\. You should use the `aws:Ec2InstanceSourceVpc` key every time you use the `aws:Ec2InstanceSourcePrivateIPv4` key to specify the VPC your Amazon EC2 instance credentials can be used from\.
+
+**Note**  
+This condition key is not available in EC2\-Classic\.
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Deny",
+            "Action":  "*",
+            "Resource": "*",
+            "Condition": {
+                "StringNotEquals": {
+                    "aws:Ec2InstanceSourceVpc": "${aws:SourceVpc}"
+                },                
+                "Null": {
+                    "ec2:SourceInstanceARN": "false"
+                },
+                "BoolIfExists": {
+                    "aws:ViaAWSService": "false"
+                }
+            }
+        },
+        {
+            "Effect": "Deny",
+            "Action":  "*",
+            "Resource": "*",
+            "Condition": {
+                "StringNotEquals": {
+                    "aws:Ec2InstanceSourcePrivateIPv4": "${aws:VpcSourceIp}"
+                },                               
+                "Null": {
+                    "ec2:SourceInstanceARN": "false"
+                },
+                "BoolIfExists": {
+                    "aws:ViaAWSService": "false"
+                }
+            }
+        }
+    ]
+}
+```
 
 ## aws:EpochTime<a name="condition-keys-epochtime"></a>
 
@@ -259,7 +358,7 @@ In the following example, access is denied except to principals with the account
       "Action": "service:*",
       "Effect": "Deny",
       "Resource": [
-        "arn:partition:service:region:accountID:resource"
+        "arn:aws:service:region:accountID:resource"
       ],
       "Condition": {
         "StringNotEquals": {
@@ -420,7 +519,7 @@ The following condition allows access for every principal in the `o-a1b2c3d4e5` 
 }}
 ```
 
-`aws:PrincipalOrgPaths` is a multivalued condition key\. Multivalued keys include one or more values in a list format\. The result is a logical `OR`\. When you use multiple values with the `ForAnyValue` condition operator, the principal's path must match one of the paths listed in the policy\. For policies that include multiple values for a single key, you must enclose the conditions within brackets like an array \("Key":\["Value1", "Value2"\]\)\. You should also include these brackets when there is a single value\. For more information about multivalued condition keys, see [Creating a condition with multiple keys or values](reference_policies_multi-value-conditions.md)\.
+`aws:PrincipalOrgPaths` is a multivalued condition key\. Multivalued keys can have multiple values in the request context\. When you use multiple values with the `ForAnyValue` condition operator, the principal's path must match one of the paths listed in the policy\. For more information about multivalued condition keys, see [Using multiple keys and values](reference_policies_multi-value-conditions.md#reference_policies_multi-key-or-value-conditions)\.
 
 ```
     "Condition": {
@@ -482,7 +581,7 @@ This key provides a list of all [service principal](reference_policies_elements_
   + If the call is made by an anonymous requester\.
 + **Value type** – Multivalued
 
-`aws:PrincipalServiceNamesList` is a multivalued condition key\. Multivalued keys include one or more values in a list format\. The result is a logical `OR`\. You must use the `ForAnyValue` or `ForAllValues` set operators with the `StringLike` [condition operator](reference_policies_elements_condition_operators.md#Conditions_String) when you use this key\. For policies that include multiple values for a single key, you must enclose the conditions within brackets like an array, such as `("Key":["Value1", "Value2"])`\. You should also include these brackets when there is a single value\. For more information about multivalued condition keys, see [Using multiple keys and values](reference_policies_multi-value-conditions.md#reference_policies_multi-key-or-value-conditions)\.
+`aws:PrincipalServiceNamesList` is a multivalued condition key\. Multivalued keys can have multiple values in the request context\. You must use the `ForAnyValue` or `ForAllValues` set operators with [string condition operators](reference_policies_elements_condition_operators.md#Conditions_String) for this key\. For more information about multivalued condition keys, see [Using multiple keys and values](reference_policies_multi-value-conditions.md#reference_policies_multi-key-or-value-conditions)\.
 
 ## aws:PrincipalTag/*tag\-key*<a name="condition-keys-principaltag"></a>
 
@@ -511,6 +610,20 @@ This example shows how you might create an identity\-based policy that allows us
       }
     }
   ]
+}
+```
+
+This example shows how you might create a resource\-based policy with the `aws:PrincipalTag` key in the resource ARN\. The policy allows the `s3:GetObject` action only if the bucket name ends with a team name from the `team` principal tag\. To use this policy, replace the *italicized placeholder text* in the example policy with your own information\. Then, follow the directions in [create a policy](access_policies_create.md) or [edit a policy](access_policies_manage-edit.md)\.
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": {
+    "Effect": "Allow",
+    "Principal": "*",
+    "Action": "s3:GetObject",
+    "Resource": "arn:aws:s3:::DOC-EXAMPLE-BUCKET-${aws:PrincipalTag/team}/"
+  }
 }
 ```
 
@@ -636,20 +749,34 @@ Use this key to compare the requested resource owner's [AWS account ID](https://
 + **Availability** – This key is always included in the request context for most service actions\. The following actions don't support this key:
   + Amazon Elastic Block Store – All actions
   + Amazon EC2
+    + `ec2:AcceptTransitGatewayPeeringAttachment`
+    + `ec2:AcceptVpcEndpointConnections`
+    + `ec2:AcceptVpcPeeringConnection`
     + `ec2:CopyFpgaImage`
     + `ec2:CopyImage`
     + `ec2:CopySnapshot`
     + `ec2:CreateTransitGatewayPeeringAttachment`
     + `ec2:CreateVolume`
+    + `ec2:CreateVpcEndpoint`
     + `ec2:CreateVpcPeeringConnection`
+    + `ec2:DeleteTransitGatewayPeeringAttachment`
+    + `ec2:DeleteVpcPeeringConnection`
+    + `ec2:RejectTransitGatewayPeeringAttachment`
+    + `ec2:RejectVpcEndpointConnections`
+    + `ec2:RejectVpcPeeringConnection`
   + Amazon EventBridge – All actions
+  + Amazon Route 53
+    + `route53:AssociateVpcWithHostedZone`
+    + `route53:CreateVPCAssociationAuthorization`
+    + `route53:DeleteVPCAssociationAuthorization`
+    + `route53:DisassociateVPCFromHostedZone`
+    + `route53:ListHostedZonesByVPC`
   + Amazon WorkSpaces
-    + `workspaces:CopyWorkspaceImage`
     + `workspaces:DescribeWorkspaceImages`
 + **Value type** – Single\-valued
 
 **Note**  
-Some AWS services require access to AWS\-owned resources that are hosted in another AWS account\. Using `aws:ResourceAccount` in your identity\-based policies might impact your identity's ability to access these resources\.
+For additional considerations for the above unsupported actions, see the [Data Perimeter Policy Examples](https://github.com/aws-samples/data-perimeter-policy-examples) repository\.
 
 This key is equal to the AWS account ID for the account with the resources evaluated in the request\.
 
@@ -675,7 +802,7 @@ This policy does not allow any actions\. Instead, it uses the `Deny` effect whic
       "Action": "service:*",
       "Effect": "Deny",
       "Resource": [
-        "arn:partition:service:region:account:*"
+        "arn:aws:service:region:account:*"
       ],
       "Condition": {
         "StringNotEquals": {
@@ -691,11 +818,12 @@ This policy does not allow any actions\. Instead, it uses the `Deny` effect whic
 
 This policy denies access to all resources for a specific AWS service unless the specified AWS account owns the resource\. 
 
-Certain AWS services, such as AWS Data Exchange and CloudFormation, rely on access to resources outside of your AWS accounts for normal operations\. If you use the element `aws:ResourceAccount` in your policies, include additional statements to create exemptions for those services\. The following example policies demonstrate how to deny access based on the resource account while defining exceptions for service\-owned resources\.
-+ [AWS: Deny access to Amazon SNS resources outside your account except CloudFormation](reference_policies_examples_cfn_sns_resource_account.md)
-+ [AWS: Deny access to Amazon S3 resources outside your account except AWS Data Exchange](reference_policies_examples_resource_account_data_exch.md)
+**Note**  
+Some AWS services require access to AWS owned resources that are hosted in another AWS account\. Using `aws:ResourceAccount` in your identity\-based policies might impact your identity's ability to access these resources\.
 
-Use these policy examples as templates for creating your own custom policies\. Refer to your service [documentation](https://docs.aws.amazon.com/index.html) for more information\.
+Certain AWS services, such as AWS Data Exchange, rely on access to resources outside of your AWS accounts for normal operations\. If you use the element `aws:ResourceAccount` in your policies, include additional statements to create exemptions for those services\. The example policy [AWS: Deny access to Amazon S3 resources outside your account except AWS Data Exchange](reference_policies_examples_resource_account_data_exch.md) demonstrates how to deny access based on the resource account while defining exceptions for service\-owned resources\.
+
+Use this policy example as a template for creating your own custom policies\. Refer to your service [documentation](https://docs.aws.amazon.com/index.html) for more information\.
 
 ## aws:ResourceOrgID<a name="condition-keys-resourceorgid"></a>
 
@@ -705,22 +833,36 @@ Use this key to compare the identifier of the organization in AWS Organizations 
 + **Availability** – This key is included in the request context only if the account that owns the resource is a member of an organization\. This global condition key does not support the following actions:
   + Amazon Elastic Block Store – All actions
   + Amazon EC2
+    + `ec2:AcceptTransitGatewayPeeringAttachment`
+    + `ec2:AcceptVpcEndpointConnections`
+    + `ec2:AcceptVpcPeeringConnection`
     + `ec2:CopyFpgaImage`
     + `ec2:CopyImage`
     + `ec2:CopySnapshot`
     + `ec2:CreateTransitGatewayPeeringAttachment`
     + `ec2:CreateVolume`
+    + `ec2:CreateVpcEndpoint`
     + `ec2:CreateVpcPeeringConnection`
+    + `ec2:DeleteTransitGatewayPeeringAttachment`
+    + `ec2:DeleteVpcPeeringConnection`
+    + `ec2:RejectTransitGatewayPeeringAttachment`
+    + `ec2:RejectVpcEndpointConnections`
+    + `ec2:RejectVpcPeeringConnection`
   + Amazon EventBridge – All actions
+  + Amazon Route 53
+    + `route53:AssociateVpcWithHostedZone`
+    + `route53:CreateVPCAssociationAuthorization`
+    + `route53:DeleteVPCAssociationAuthorization`
+    + `route53:DisassociateVPCFromHostedZone`
+    + `route53:ListHostedZonesByVPC`
   + Amazon WorkSpaces
-    + `workspaces:CopyWorkspaceImage`
     + `workspaces:DescribeWorkspaceImages`
 + **Value type** – Single\-valued
 
-This global key returns the resource organization ID for a given request\. It allows you to create rules that apply to all resources in an organization that are specified in the `Resource` element of an [identity\-based policy](access_policies_identity-vs-resource.md)\. You can specify the [organization ID](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_org_details.html) in the condition element\. When you add and remove accounts, policies that include the `aws:ResourceOrgID` key automatically include the correct accounts and you don't have to manually update it\.
-
 **Note**  
-Some AWS services require access to AWS\-owned resources that are hosted in another AWS account\. Using `aws:ResourceOrgID` in your identity\-based policies might impact your identity's ability to access these resources\.
+For additional considerations for the above unsupported actions, see the [Data Perimeter Policy Examples](https://github.com/aws-samples/data-perimeter-policy-examples) repository\.
+
+This global key returns the resource organization ID for a given request\. It allows you to create rules that apply to all resources in an organization that are specified in the `Resource` element of an [identity\-based policy](access_policies_identity-vs-resource.md)\. You can specify the [organization ID](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_org_details.html) in the condition element\. When you add and remove accounts, policies that include the `aws:ResourceOrgID` key automatically include the correct accounts and you don't have to manually update it\.
 
 For example, the following policy prevents the principal from adding objects to the `policy-genius-dev` resource unless the Amazon S3 resource belongs to the same organization as the principal making the request\.
 
@@ -744,6 +886,13 @@ This policy does not allow any actions\. Instead, it uses the `Deny` effect whic
 }
 ```
 
+**Note**  
+Some AWS services require access to AWS owned resources that are hosted in another AWS account\. Using `aws:ResourceOrgID` in your identity\-based policies might impact your identity's ability to access these resources\.
+
+Certain AWS services, such as AWS Data Exchange, rely on access to resources outside of your AWS accounts for normal operations\. If you use the `aws:ResourceOrgID` key in your policies, include additional statements to create exemptions for those services\. The example policy [AWS: Deny access to Amazon S3 resources outside your account except AWS Data Exchange](reference_policies_examples_resource_account_data_exch.md) demonstrates how to deny access based on the resource account while defining exceptions for service\-owned resources\. You can create a similar policy to restrict access to resources within your organization using the `aws:ResourceOrgID` key, while accounting for service\-owned resources\.
+
+Use this policy example as a template for creating your own custom policies\. Refer to your service [documentation](https://docs.aws.amazon.com/index.html) for more information\.
+
 ## aws:ResourceOrgPaths<a name="condition-keys-resourceorgpaths"></a>
 
 Works with [string operators](reference_policies_elements_condition_operators.md#Conditions_String)\.
@@ -752,22 +901,36 @@ Use this key to compare the AWS Organizations path for the accessed resource to 
 + **Availability** – This key is included in the request context only if the account that owns the resource is a member of an organization\. This global condition key does not support the following actions:
   + Amazon Elastic Block Store – All actions
   + Amazon EC2
+    + `ec2:AcceptTransitGatewayPeeringAttachment`
+    + `ec2:AcceptVpcEndpointConnections`
+    + `ec2:AcceptVpcPeeringConnection`
     + `ec2:CopyFpgaImage`
     + `ec2:CopyImage`
     + `ec2:CopySnapshot`
     + `ec2:CreateTransitGatewayPeeringAttachment`
     + `ec2:CreateVolume`
+    + `ec2:CreateVpcEndpoint`
     + `ec2:CreateVpcPeeringConnection`
+    + `ec2:DeleteTransitGatewayPeeringAttachment`
+    + `ec2:DeleteVpcPeeringConnection`
+    + `ec2:RejectTransitGatewayPeeringAttachment`
+    + `ec2:RejectVpcEndpointConnections`
+    + `ec2:RejectVpcPeeringConnection`
   + Amazon EventBridge – All actions
+  + Amazon Route 53
+    + `route53:AssociateVpcWithHostedZone`
+    + `route53:CreateVPCAssociationAuthorization`
+    + `route53:DeleteVPCAssociationAuthorization`
+    + `route53:DisassociateVPCFromHostedZone`
+    + `route53:ListHostedZonesByVPC`
   + Amazon WorkSpaces
-    + `workspaces:CopyWorkspaceImage`
     + `workspaces:DescribeWorkspaceImages`
 + **Value type** – Multivalued
 
-`aws:ResourceOrgPaths` is a multivalued condition key\. Multivalued keys include one or more values in a list format\. The result is a logical `OR`\. You must use the `ForAnyValue` or `ForAllValues` set operators with the `StringLike` [condition operator](reference_policies_elements_condition_operators.md#Conditions_String) when you use this key\. For policies that include multiple values for a single key, you must enclose the conditions within brackets like an array, such as `("Key":["Value1", "Value2"])`\. You should also include these brackets when there is a single value\. For more information about multivalued condition keys, see [Using multiple keys and values](reference_policies_multi-value-conditions.md#reference_policies_multi-key-or-value-conditions)\.
-
 **Note**  
-Some AWS services require access to AWS\-owned resources that are hosted in another AWS account\. Using `aws:ResourceOrgPaths` in your identity\-based policies might impact your identity's ability to access these resources\.
+For additional considerations for the above unsupported actions, see the [Data Perimeter Policy Examples](https://github.com/aws-samples/data-perimeter-policy-examples) repository\.
+
+`aws:ResourceOrgPaths` is a multivalued condition key\. Multivalued keys can have multiple values in the request context\. You must use the `ForAnyValue` or `ForAllValues` set operators with [string condition operators](reference_policies_elements_condition_operators.md#Conditions_String) for this key\. For more information about multivalued condition keys, see [Using multiple keys and values](reference_policies_multi-value-conditions.md#reference_policies_multi-key-or-value-conditions)\.
 
 For example, the following condition returns `True` for resources that belong to the organization `o-a1b2c3d4e5`\. When you include a wildcard, you must use the [StringLike](reference_policies_elements_condition_operators.md) condition operator\.
 
@@ -779,7 +942,7 @@ For example, the following condition returns `True` for resources that belong to
 }
 ```
 
-The following condition returns `True` for resources owned by accounts attached to the OU `ou-ab12-11111111` or any of the child OUs\.
+The following condition returns `True` for resources with the OU ID `ou-ab12-11111111`\. It will match resources owned by accounts attached to the OU ou\-ab12\-11111111 or any of the child OUs\.
 
 ```
 "Condition": { "ForAnyValue:StringLike" : {
@@ -787,13 +950,20 @@ The following condition returns `True` for resources owned by accounts attached 
 }}
 ```
 
-The following condition returns `True` for resources owned by accounts attached directly to the OU `ou-ab12-22222222`, but not the child OUs\. The following example uses the [StringEquals](reference_policies_elements_condition_operators.md) condition operator to specify the exact match requirement for the OU and not a wildcard match\.
+The following condition returns `True` for resources owned by accounts attached directly to the OU ID `ou-ab12-22222222`, but not the child OUs\. The following example uses the [StringEquals](reference_policies_elements_condition_operators.md) condition operator to specify the exact match requirement for the OU ID and not a wildcard match\.
 
 ```
 "Condition": { "ForAnyValue:StringEquals" : {
      "aws:ResourceOrgPaths":["o-a1b2c3d4e5/r-ab12/ou-ab12-11111111/ou-ab12-22222222/"]
 }}
 ```
+
+**Note**  
+Some AWS services require access to AWS owned resources that are hosted in another AWS account\. Using `aws:ResourceOrgPaths` in your identity\-based policies might impact your identity's ability to access these resources\.
+
+Certain AWS services, such as AWS Data Exchange, rely on access to resources outside of your AWS accounts for normal operations\. If you use the `aws:ResourceOrgPaths` key in your policies, include additional statements to create exemptions for those services\. The example policy [AWS: Deny access to Amazon S3 resources outside your account except AWS Data Exchange](reference_policies_examples_resource_account_data_exch.md) demonstrates how to deny access based on the resource account while defining exceptions for service\-owned resources\. You can create a similar policy to restrict access to resources within an organizational unit \(OU\) using the `aws:ResourceOrgPaths` key, while accounting for service\-owned resources\.
+
+Use this policy example as a template for creating your own custom policies\. Refer to your service [documentation](https://docs.aws.amazon.com/index.html) for more information\.
 
 ## aws:ResourceTag/*tag\-key*<a name="condition-keys-resourcetag"></a>
 
@@ -864,7 +1034,7 @@ The following role trust policy for `CriticalRole` in account `111122223333` con
         {
             "Sid": "AssumeRoleIfSourceIdentity",
             "Effect": "Allow",
-            "Principal": {"AWS": " arn:aws:iam::123456789012:role/CriticalRole"},
+            "Principal": {"AWS": "arn:aws:iam::123456789012:role/CriticalRole"},
             "Action": [
                 "sts:AssumeRole",
                 "sts:SetSourceIdentity"
@@ -890,6 +1060,9 @@ Use this key to compare the requester's IP address with the IP address that you 
 + **Value type** – Single\-valued
 
 The `aws:SourceIp` condition key can be used in a policy to allow principals to make requests only from within a specified IP range\. However, this policy denies access if an AWS service makes calls on the principal's behalf\. In this case, you can use `aws:SourceIp` with the `aws:ViaAWSService` key to ensure that the source IP restriction applies only to requests made directly by a principal\. 
+
+**Note**  
+ `aws:SourceIp` supports both IPv4 and IPv6 address or range of IP addresses\. For details, see [Upgrade IAM policies to IPv6](https://docs.aws.amazon.com/marketplace/latest/buyerguide/buyer-security-ipv6-upgrade.html)\.
 
 For example, you can attach the following policy to an IAM user\. This policy allows the user to put an object into the `DOC-EXAMPLE-BUCKET3` Amazon S3 bucket directly if they make the call from the specified IP address\. However, if the user makes another request that causes a service to call Amazon S3, the IP address restriction does not apply\. The `PrincipalPutObjectIfIpAddress` statement restricts the IP address only if the request is not made by a service\. The `ServicePutObject` statement allows the operation without IP address restriction if the request is made by a service\.
 
@@ -942,7 +1115,7 @@ Use this key to compare the VPC endpoint identifier of the request with the endp
 
 Works with [string operators](reference_policies_elements_condition_operators.md#Conditions_String)\.
 
-Use this key to compare the tag keys in a request with the keys that you specify in the policy\. As a best practice when you use policies to control access using tags, use the `aws:TagKeys` condition key to define what tag keys are allowed\. For example policies and more information, see [Controlling access based on tag keys](access_tags.md#access_tags_control-tag-keys)\.
+Use this key to compare the tag keys in a request with the keys that you specify in the policy\. We recommend that when you use policies to control access using tags, use the `aws:TagKeys` condition key to define what tag keys are allowed\. For example policies and more information, see [Controlling access based on tag keys](access_tags.md#access_tags_control-tag-keys)\.
 + **Availability** – This key is included in the request context if the operation supports passing tags in the request\.
 + **Value type** – Multivalued
 

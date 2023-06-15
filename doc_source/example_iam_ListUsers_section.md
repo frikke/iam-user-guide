@@ -1,6 +1,9 @@
 # List IAM users using an AWS SDK<a name="example_iam_ListUsers_section"></a>
 
-The following code examples show how to list IAM users\.
+The following code examples show how to list IAM users\. 
+
+**Warning**  
+To avoid security risks, don't use IAM users for authentication when developing purpose\-built software or working with real data\. Instead, use federation with an identity provider such as [AWS IAM Identity Center \(successor to AWS Single Sign\-On\)](https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html)\.
 
 **Note**  
 The source code for these examples is in the [AWS Code Examples GitHub repository](https://github.com/awsdocs/aws-doc-sdk-examples)\. Have feedback on a code example? [Create an Issue](https://github.com/awsdocs/aws-doc-sdk-examples/issues/new/choose) in the code examples repo\. 
@@ -9,54 +12,110 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 #### [ \.NET ]
 
 **AWS SDK for \.NET**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
   
 
 ```
-using System;
-using Amazon.IdentityManagement;
-using Amazon.IdentityManagement.Model;
-
-var client = new AmazonIdentityManagementServiceClient();
-var request = new ListUsersRequest
-{
-    MaxItems = 10,
-};
-var response = await client.ListUsersAsync(request);
-
-do
-{
-    response.Users.ForEach(user =>
+    /// <summary>
+    /// List IAM users.
+    /// </summary>
+    /// <returns>A list of IAM users.</returns>
+    public async Task<List<User>> ListUsersAsync()
     {
-        Console.WriteLine($"{user.UserName} created on {user.CreateDate}.");
-        Console.WriteLine($"ARN: {user.Arn}\n");
-    });
+        var listUsersPaginator = _IAMService.Paginators.ListUsers(new ListUsersRequest());
+        var users = new List<User>();
 
-    request.Marker = response.Marker;
-    response = await client.ListUsersAsync(request);
-} while (response.IsTruncated);
+        await foreach (var response in listUsersPaginator.Responses)
+        {
+            users.AddRange(response.Users);
+        }
+
+        return users;
+    }
 ```
 +  For API details, see [ListUsers](https://docs.aws.amazon.com/goto/DotNetSDKV3/iam-2010-05-08/ListUsers) in *AWS SDK for \.NET API Reference*\. 
+
+------
+#### [ C\+\+ ]
+
+**SDK for C\+\+**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/cpp/example_code/iam#code-examples)\. 
+  
+
+```
+bool AwsDoc::IAM::listUsers(const Aws::Client::ClientConfiguration &clientConfig) {
+    const Aws::String DATE_FORMAT = "%Y-%m-%d";
+    Aws::IAM::IAMClient iam(clientConfig);
+    Aws::IAM::Model::ListUsersRequest request;
+
+    bool done = false;
+    bool header = false;
+    while (!done) {
+        auto outcome = iam.ListUsers(request);
+        if (!outcome.IsSuccess()) {
+            std::cerr << "Failed to list iam users:" <<
+                      outcome.GetError().GetMessage() << std::endl;
+            return false;
+        }
+
+        if (!header) {
+            std::cout << std::left << std::setw(32) << "Name" <<
+                      std::setw(30) << "ID" << std::setw(64) << "Arn" <<
+                      std::setw(20) << "CreateDate" << std::endl;
+            header = true;
+        }
+
+        const auto &users = outcome.GetResult().GetUsers();
+        for (const auto &user: users) {
+            std::cout << std::left << std::setw(32) << user.GetUserName() <<
+                      std::setw(30) << user.GetUserId() << std::setw(64) <<
+                      user.GetArn() << std::setw(20) <<
+                      user.GetCreateDate().ToGmtString(DATE_FORMAT.c_str())
+                      << std::endl;
+        }
+
+        if (outcome.GetResult().GetIsTruncated()) {
+            request.SetMarker(outcome.GetResult().GetMarker());
+        }
+        else {
+            done = true;
+        }
+    }
+
+    return true;
+}
+```
++  For API details, see [ListUsers](https://docs.aws.amazon.com/goto/SdkForCpp/iam-2010-05-08/ListUsers) in *AWS SDK for C\+\+ API Reference*\. 
 
 ------
 #### [ Go ]
 
 **SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
   
 
 ```
-	// ListUsers
+// UserWrapper encapsulates user actions used in the examples.
+// It contains an IAM service client that is used to perform user actions.
+type UserWrapper struct {
+	IamClient *iam.Client
+}
 
-	fmt.Println("➡️ List users")
 
-	userListResult, err := service.ListUsers(context.Background(), &iam.ListUsersInput{})
+
+// ListUsers gets up to maxUsers number of users.
+func (wrapper UserWrapper) ListUsers(maxUsers int32) ([]types.User, error) {
+	var users []types.User
+	result, err := wrapper.IamClient.ListUsers(context.TODO(), &iam.ListUsersInput{
+		MaxItems: aws.Int32(maxUsers),
+	})
 	if err != nil {
-		panic("Couldn't list users: " + err.Error())
+		log.Printf("Couldn't list users. Here's why: %v\n", err)
+	} else {
+		users = result.Users
 	}
-	for _, userResult := range userListResult.Users {
-		fmt.Printf("%s\t%s\n", *userResult.UserName, *userResult.Arn)
-	}
+	return users, err
+}
 ```
 +  For API details, see [ListUsers](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.ListUsers) in *AWS SDK for Go API Reference*\. 
 
@@ -64,7 +123,7 @@ do
 #### [ Java ]
 
 **SDK for Java 2\.x**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javav2/example_code/iam#readme)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javav2/example_code/iam#readme)\. 
   
 
 ```
@@ -113,47 +172,30 @@ do
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 List the users\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { ListUsersCommand } from "@aws-sdk/client-iam";
+import { ListUsersCommand, IAMClient } from "@aws-sdk/client-iam";
 
-// Set the parameters.
-export const params = { MaxItems: 10 };
+const client = new IAMClient({});
 
-export const run = async () => {
-  try {
-    const data = await iamClient.send(new ListUsersCommand(params));
-    return data;
-    const users = data.Users || [];
-    users.forEach(function (user) {
-      console.log("User " + user.UserName + " created", user.CreateDate);
-    });
-  } catch (err) {
-    console.log("Error", err);
-  }
+export const listUsers = async () => {
+  const command = new ListUsersCommand({ MaxItems: 10 });
+
+  const response = await client.send(command);
+  response.Users?.forEach(({ UserName, CreateDate }) => {
+    console.log(`${UserName} created on: ${CreateDate}`);
+  });
+  return response;
 };
-run();
 ```
 +  For more information, see [AWS SDK for JavaScript Developer Guide](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/iam-examples-managing-users.html#iam-examples-managing-users-listing-users)\. 
 +  For API details, see [ListUsers](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/listuserscommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
-**SDK for JavaScript V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
+**SDK for JavaScript \(v2\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
   
 
 ```
@@ -188,7 +230,7 @@ iam.listUsers(params, function(err, data) {
 
 **SDK for Kotlin**  
 This is prerelease documentation for a feature in preview release\. It is subject to change\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/kotlin/services/iam#code-examples)\. 
   
 
 ```
@@ -211,12 +253,12 @@ suspend fun listAllUsers() {
 #### [ PHP ]
 
 **SDK for PHP**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
   
 
 ```
 $uuid = uniqid();
-$service = new IamService();
+$service = new IAMService();
 
     public function listUsers($pathPrefix = "", $marker = "", $maxItems = 0)
     {
@@ -240,7 +282,7 @@ $service = new IamService();
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```
@@ -265,7 +307,7 @@ def list_users():
 #### [ Ruby ]
 
 **SDK for Ruby**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
   
 
 ```
@@ -289,7 +331,7 @@ def list_users():
 
 **SDK for Rust**  
 This documentation is for an SDK in preview release\. The SDK is subject to change and should not be used in production\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
   
 
 ```
@@ -310,6 +352,41 @@ pub async fn list_users(
 }
 ```
 +  For API details, see [ListUsers](https://docs.rs/releases/search?query=aws-sdk) in *AWS SDK for Rust API reference*\. 
+
+------
+#### [ Swift ]
+
+**SDK for Swift**  
+This is prerelease documentation for an SDK in preview release\. It is subject to change\.
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/swift/example_code/iam#code-examples)\. 
+  
+
+```
+    public func listUsers() async throws -> [MyUserRecord] {
+        var userList: [MyUserRecord] = []
+        var marker: String? = nil
+        var isTruncated: Bool
+        
+        repeat {
+            let input = ListUsersInput(marker: marker)
+            let output = try await client.listUsers(input: input)
+            
+            guard let users = output.users else {
+                return userList
+            }
+
+            for user in users {
+                if let id = user.userId, let name = user.userName {
+                    userList.append(MyUserRecord(id: id, name: name))
+                }
+            }
+            marker = output.marker
+            isTruncated = output.isTruncated
+        } while isTruncated == true
+        return userList
+    }
+```
++  For API details, see [ListUsers](https://awslabs.github.io/aws-sdk-swift/reference/0.x) in *AWS SDK for Swift API reference*\. 
 
 ------
 

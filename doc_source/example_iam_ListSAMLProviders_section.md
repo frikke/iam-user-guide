@@ -9,22 +9,19 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 #### [ \.NET ]
 
 **AWS SDK for \.NET**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
   
 
 ```
-using System;
-using Amazon.IdentityManagement;
-using Amazon.IdentityManagement.Model;
-
-var client = new AmazonIdentityManagementServiceClient();
-
-var response = await client.ListSAMLProvidersAsync(new ListSAMLProvidersRequest());
-
-response.SAMLProviderList.ForEach(samlProvider =>
-{
-    Console.WriteLine($"{samlProvider.Arn} created on: {samlProvider.CreateDate}");
-});
+    /// <summary>
+    /// List SAML authentication providers.
+    /// </summary>
+    /// <returns>A list of SAML providers.</returns>
+    public async Task<List<SAMLProviderListEntry>> ListSAMLProvidersAsync()
+    {
+        var response = await _IAMService.ListSAMLProvidersAsync(new ListSAMLProvidersRequest());
+        return response.SAMLProviderList;
+    }
 ```
 +  For API details, see [ListSAMLProviders](https://docs.aws.amazon.com/goto/DotNetSDKV3/iam-2010-05-08/ListSAMLProviders) in *AWS SDK for \.NET API Reference*\. 
 
@@ -32,56 +29,52 @@ response.SAMLProviderList.ForEach(samlProvider =>
 #### [ Go ]
 
 **SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
   
 
 ```
-	// ListSAMLProviders
+// AccountWrapper encapsulates AWS Identity and Access Management (IAM) account actions
+// used in the examples.
+// It contains an IAM service client that is used to perform account actions.
+type AccountWrapper struct {
+	IamClient *iam.Client
+}
 
-	samlProviderList, err := service.ListSAMLProviders(context.Background(), &iam.ListSAMLProvidersInput{})
 
+
+// ListSAMLProviders gets the SAML providers for the account.
+func (wrapper AccountWrapper) ListSAMLProviders() ([]types.SAMLProviderListEntry, error) {
+	var providers []types.SAMLProviderListEntry
+	result, err := wrapper.IamClient.ListSAMLProviders(context.TODO(), &iam.ListSAMLProvidersInput{})
 	if err != nil {
-		panic("Couldn't list saml providers: " + err.Error())
+		log.Printf("Couldn't list SAML providers. Here's why: %v\n", err)
+	} else {
+		providers = result.SAMLProviderList
 	}
-
-	for _, provider := range samlProviderList.SAMLProviderList {
-		fmt.Printf("%s %s -> %s", *provider.Arn, *provider.CreateDate, *provider.ValidUntil)
-	}
+	return providers, err
+}
 ```
 +  For API details, see [ListSAMLProviders](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.ListSAMLProviders) in *AWS SDK for Go API Reference*\. 
 
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 List the SAML providers\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import {ListSAMLProvidersCommand} from "@aws-sdk/client-iam";
+import { ListSAMLProvidersCommand, IAMClient } from "@aws-sdk/client-iam";
 
-export const run = async () => {
-    try {
-        const results = await iamClient.send(new ListSAMLProvidersCommand({}));
-        console.log("Success", results);
-        return results;
-    } catch (err) {
-        console.log("Error", err);
-    }
-}
-run();
+const client = new IAMClient({});
+
+export const listSamlProviders = async () => {
+  const command = new ListSAMLProvidersCommand({});
+
+  const response = await client.send(command);
+  console.log(response);
+  return response;
+};
 ```
 +  For API details, see [ListSAMLProviders](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/listsamlproviderscommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
@@ -89,12 +82,12 @@ run();
 #### [ PHP ]
 
 **SDK for PHP**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
   
 
 ```
 $uuid = uniqid();
-$service = new IamService();
+$service = new IAMService();
 
     public function listSAMLProviders()
     {
@@ -107,7 +100,7 @@ $service = new IamService();
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```
@@ -134,7 +127,7 @@ def list_saml_providers(count):
 #### [ Ruby ]
 
 **SDK for Ruby**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
   
 
 ```
@@ -158,7 +151,7 @@ def list_saml_providers(count):
 
 **SDK for Rust**  
 This documentation is for an SDK in preview release\. The SDK is subject to change and should not be used in production\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
   
 
 ```

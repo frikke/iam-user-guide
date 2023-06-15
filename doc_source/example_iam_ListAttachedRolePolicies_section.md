@@ -9,37 +9,27 @@ The source code for these examples is in the [AWS Code Examples GitHub repositor
 #### [ \.NET ]
 
 **AWS SDK for \.NET**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/dotnetv3/IAM#code-examples)\. 
   
 
 ```
-using System;
-using Amazon.IdentityManagement;
-using Amazon.IdentityManagement.Model;
-
-var client = new AmazonIdentityManagementServiceClient();
-var request = new ListAttachedRolePoliciesRequest
-{
-    MaxItems = 10,
-    RoleName = "testAssumeRole",
-};
-
-var response = await client.ListAttachedRolePoliciesAsync(request);
-
-do
-{
-    response.AttachedPolicies.ForEach(policy =>
+    /// <summary>
+    /// List the IAM role policies that are attached to an IAM role.
+    /// </summary>
+    /// <param name="roleName">The IAM role to list IAM policies for.</param>
+    /// <returns>A list of the IAM policies attached to the IAM role.</returns>
+    public async Task<List<AttachedPolicyType>> ListAttachedRolePoliciesAsync(string roleName)
     {
-        Console.WriteLine($"{policy.PolicyName} with ARN: {policy.PolicyArn}");
-    });
+        var attachedPolicies = new List<AttachedPolicyType>();
+        var attachedRolePoliciesPaginator = _IAMService.Paginators.ListAttachedRolePolicies(new ListAttachedRolePoliciesRequest { RoleName = roleName });
 
-    if (response.IsTruncated)
-    {
-        request.Marker = response.Marker;
-        response = await client.ListAttachedRolePoliciesAsync(request);
+        await foreach (var response in attachedRolePoliciesPaginator.Responses)
+        {
+            attachedPolicies.AddRange(response.AttachedPolicies);
+        }
+
+        return attachedPolicies;
     }
-
-} while (response.IsTruncated);
 ```
 +  For API details, see [ListAttachedRolePolicies](https://docs.aws.amazon.com/goto/DotNetSDKV3/iam-2010-05-08/ListAttachedRolePolicies) in *AWS SDK for \.NET API Reference*\. 
 
@@ -47,64 +37,79 @@ do
 #### [ Go ]
 
 **SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
   
 
 ```
-	// ListAttachedRolePolicies
+// RoleWrapper encapsulates AWS Identity and Access Management (IAM) role actions
+// used in the examples.
+// It contains an IAM service client that is used to perform role actions.
+type RoleWrapper struct {
+	IamClient *iam.Client
+}
 
-	attachedPoliciesList, err := service.ListAttachedRolePolicies(context.Background(), &iam.ListAttachedRolePoliciesInput{
-		RoleName: aws.String(ExampleRoleName),
+
+
+// ListAttachedRolePolicies lists the policies that are attached to the specified role.
+func (wrapper RoleWrapper) ListAttachedRolePolicies(roleName string) ([]types.AttachedPolicy, error) {
+	var policies []types.AttachedPolicy
+	result, err := wrapper.IamClient.ListAttachedRolePolicies(context.TODO(), &iam.ListAttachedRolePoliciesInput{
+		RoleName: aws.String(roleName),
 	})
-
 	if err != nil {
-		panic("Couldn't call ListAttachedRolePolicies: " + err.Error())
+		log.Printf("Couldn't list attached policies for role %v. Here's why: %v\n", roleName, err)
+	} else {
+		policies = result.AttachedPolicies
 	}
-
-	fmt.Println("➡️ List attached role policies for " + ExampleRoleName)
-
-	for _, attachedPolicy := range attachedPoliciesList.AttachedPolicies {
-		fmt.Printf("attached policy: %v\n (%v) \n", attachedPolicy.PolicyArn, attachedPolicy.PolicyName)
-	}
+	return policies, err
+}
 ```
 +  For API details, see [ListAttachedRolePolicies](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.ListAttachedRolePolicies) in *AWS SDK for Go API Reference*\. 
 
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 List the policies that are attached to a role\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import {ListAttachedRolePoliciesCommand} from "@aws-sdk/client-iam";
+import {
+  ListAttachedRolePoliciesCommand,
+  IAMClient,
+} from "@aws-sdk/client-iam";
 
-// Set the parameters.
-export const params = {
-    RoleName: 'ROLE_NAME' /* required */
-};
+const client = new IAMClient({});
 
-export const run = async () => {
-    try {
-        const data = await iamClient.send(new ListAttachedRolePoliciesCommand(params));
-        console.log("Success", data.AttachedPolicies);
-    } catch (err) {
-        console.log("Error", err);
+/**
+ * A generator function that handles paginated results.
+ * The AWS SDK for JavaScript (v3) provides {@link https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/index.html#paginators | paginator} functions to simplify this.
+ * @param {string} roleName
+ */
+export async function* listAttachedRolePolicies(roleName) {
+  const command = new ListAttachedRolePoliciesCommand({
+    RoleName: roleName,
+  });
+
+  let response = await client.send(command);
+
+  while (response.AttachedPolicies?.length) {
+    for (const policy of response.AttachedPolicies) {
+      yield policy;
     }
+
+    if (response.IsTruncated) {
+      response = await client.send(
+        new ListAttachedRolePoliciesCommand({
+          RoleName: roleName,
+          Marker: response.Marker,
+        })
+      );
+    } else {
+      break;
+    }
+  }
 }
-run();
 ```
 +  For API details, see [ListAttachedRolePolicies](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/listattachedrolepoliciescommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
@@ -112,12 +117,12 @@ run();
 #### [ PHP ]
 
 **SDK for PHP**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/php/example_code/iam/iam_basics#code-examples)\. 
   
 
 ```
 $uuid = uniqid();
-$service = new IamService();
+$service = new IAMService();
 
     public function listAttachedRolePolicies($roleName, $pathPrefix = "", $marker = "", $maxItems = 0)
     {
@@ -140,7 +145,7 @@ $service = new IamService();
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```
@@ -164,7 +169,7 @@ def list_attached_policies(role_name):
 #### [ Ruby ]
 
 **SDK for Ruby**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/ruby/example_code/iam#code-examples)\. 
   
 
 ```
@@ -195,7 +200,7 @@ def list_attached_policies(role_name):
 
 **SDK for Rust**  
 This documentation is for an SDK in preview release\. The SDK is subject to change and should not be used in production\.
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/rust_dev_preview/iam#code-examples)\. 
   
 
 ```
@@ -219,6 +224,49 @@ pub async fn list_attached_role_policies(
 }
 ```
 +  For API details, see [ListAttachedRolePolicies](https://docs.rs/releases/search?query=aws-sdk) in *AWS SDK for Rust API reference*\. 
+
+------
+#### [ Swift ]
+
+**SDK for Swift**  
+This is prerelease documentation for an SDK in preview release\. It is subject to change\.
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/swift/example_code/iam#code-examples)\. 
+  
+
+```
+    /// Returns a list of AWS Identity and Access Management (IAM) policies
+    /// that are attached to the role.
+    ///
+    /// - Parameter role: The IAM role to return the policy list for.
+    ///
+    /// - Returns: An array of `IAMClientTypes.AttachedPolicy` objects
+    ///   describing each managed policy that's attached to the role.
+    public func listAttachedRolePolicies(role: String) async throws -> [IAMClientTypes.AttachedPolicy] {
+        var policyList: [IAMClientTypes.AttachedPolicy] = []
+        var marker: String? = nil
+        var isTruncated: Bool
+        
+        repeat {
+            let input = ListAttachedRolePoliciesInput(
+                marker: marker,
+                roleName: role
+            )
+            let output = try await client.listAttachedRolePolicies(input: input)
+            
+            guard let attachedPolicies = output.attachedPolicies else {
+                return policyList
+            }
+
+            for attachedPolicy in attachedPolicies {
+                policyList.append(attachedPolicy)
+            }
+            marker = output.marker
+            isTruncated = output.isTruncated
+        } while isTruncated == true
+        return policyList
+    }
+```
++  For API details, see [ListAttachedRolePolicies](https://awslabs.github.io/aws-sdk-swift/reference/0.x) in *AWS SDK for Swift API reference*\. 
 
 ------
 

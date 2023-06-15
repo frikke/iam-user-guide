@@ -1,6 +1,6 @@
 # Example IAM identity\-based policies<a name="access_policies_examples"></a>
 
-A [policy](access_policies.md) is an object in AWS that, when associated with an identity or resource, defines their permissions\. AWS evaluates these policies when an IAM principal \(user or role\) makes a request\. Permissions in the policies determine whether the request is allowed or denied\. Most policies are stored in AWS as JSON documents that are attached to an IAM identity \(user, group of users, or role\)\. Identity\-based policies include AWS managed policies, customer managed policies, and inline policies\. To learn how to create an IAM policy using these example JSON policy documents, see [Creating policies on the JSON tab](access_policies_create-console.md#access_policies_create-json-editor)\.
+A [policy](access_policies.md) is an object in AWS that, when associated with an identity or resource, defines their permissions\. AWS evaluates these policies when an IAM principal \(user or role\) makes a request\. Permissions in the policies determine whether the request is allowed or denied\. Most policies are stored in AWS as JSON documents that are attached to an IAM identity \(user, group of users, or role\)\. Identity\-based policies include AWS managed policies, customer managed policies, and inline policies\. To learn how to create an IAM policy using these example JSON policy documents, see [Creating policies using the JSON editor](access_policies_create-console.md#access_policies_create-json-editor)\.
 
 By default all requests are denied, so you must provide access to the services, actions, and resources that you intend for the identity to access\. If you also want to allow access to complete the specified actions in the IAM console, you need to provide additional permissions\.
 
@@ -12,17 +12,14 @@ If you would like to submit a policy to be included in this reference guide, use
 ## Example policies: AWS<a name="policy_library_AWS"></a>
 + Allows access during a specific range of dates\. \([View this policy](reference_policies_examples_aws-dates.md)\.\)
 + Allows enabling and disabling AWS Regions\. \([View this policy](reference_policies_examples_aws-enable-disable-regions.md)\.\)
-+ Allows MFA\-authenticated users to manage their own credentials on the **My Security Credentials** page\. \([View this policy](reference_policies_examples_aws_my-sec-creds-self-manage.md)\.\)
++ Allows MFA\-authenticated users to manage their own credentials on the **My security credentials** page\. \([View this policy](reference_policies_examples_aws_my-sec-creds-self-manage.md)\.\)
 + Allows specific access when using MFA during a specific range of dates\. \([View this policy](reference_policies_examples_aws_mfa-dates.md)\.\)
-+ Allows users to manage their own credentials on the **My Security Credentials** page\. \([View this policy](reference_policies_examples_aws_my-sec-creds-self-manage-no-mfa.md)\.\)
-+ Allows users to manage their own MFA device on the **My Security Credentials** page\. \([View this policy](reference_policies_examples_aws_my-sec-creds-self-manage-mfa-only.md)\.\)
-+ Allows users to manage their own password on the **My Security Credentials** page\. \([View this policy](reference_policies_examples_aws_my-sec-creds-self-manage-password-only.md)\.\)
-+ Allows users to manage their own password, access keys, and SSH public keys on the **My Security Credentials** page\. \([View this policy](reference_policies_examples_aws_my-sec-creds-self-manage-pass-accesskeys-ssh.md)\.\)
++ Allows users to manage their own credentials on the **My security credentials** page\. \([View this policy](reference_policies_examples_aws_my-sec-creds-self-manage-no-mfa.md)\.\)
++ Allows users to manage their own MFA device on the **My security credentials** page\. \([View this policy](reference_policies_examples_aws_my-sec-creds-self-manage-mfa-only.md)\.\)
++ Allows users to manage their own password on the **My security credentials** page\. \([View this policy](reference_policies_examples_aws_my-sec-creds-self-manage-password-only.md)\.\)
++ Allows users to manage their own password, access keys, and SSH public keys on the **My security credentials** page\. \([View this policy](reference_policies_examples_aws_my-sec-creds-self-manage-pass-accesskeys-ssh.md)\.\)
 + Denies access to AWS based on the requested Region\. \([View this policy](reference_policies_examples_aws_deny-requested-region.md)\.\)
 + Denies access to AWS based on the source IP address\. \([View this policy](reference_policies_examples_aws_deny-ip.md)\.\)
-
-## Example policy: AWS CloudFormation<a name="policy_cfn_sns"></a>
-+ Deny access to Amazon SNS resources outside of your account except CloudFormation\. \([View this policy](reference_policies_examples_cfn_sns_resource_account.md)\.\)
 
 ## Example policy: AWS Data Exchange<a name="policy_data_exchange"></a>
 + Deny access to Amazon S3 resources outside of your account except AWS Data Exchange\. \([View this policy](reference_policies_examples_resource_account_data_exch.md)\.\)

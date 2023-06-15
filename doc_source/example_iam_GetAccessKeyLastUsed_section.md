@@ -1,122 +1,89 @@
 # Get data about the last use of an IAM access key using an AWS SDK<a name="example_iam_GetAccessKeyLastUsed_section"></a>
 
-The following code examples show how to get data about the last use of an IAM access key\.
+The following code examples show how to get data about the last use of an IAM access key\. 
+
+**Warning**  
+To avoid security risks, don't use IAM users for authentication when developing purpose\-built software or working with real data\. Instead, use federation with an identity provider such as [AWS IAM Identity Center \(successor to AWS Single Sign\-On\)](https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html)\.
 
 **Note**  
 The source code for these examples is in the [AWS Code Examples GitHub repository](https://github.com/awsdocs/aws-doc-sdk-examples)\. Have feedback on a code example? [Create an Issue](https://github.com/awsdocs/aws-doc-sdk-examples/issues/new/choose) in the code examples repo\. 
 
 ------
-#### [ Go ]
+#### [ C\+\+ ]
 
-**SDK for Go V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/gov2/iam#code-examples)\. 
+**SDK for C\+\+**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/cpp/example_code/iam#code-examples)\. 
   
 
 ```
-package main
+bool AwsDoc::IAM::accessKeyLastUsed(const Aws::String &secretKeyID,
+                                    const Aws::Client::ClientConfiguration &clientConfig) {
+    Aws::IAM::IAMClient iam(clientConfig);
+    Aws::IAM::Model::GetAccessKeyLastUsedRequest request;
 
-import (
-	"context"
-	"flag"
-	"fmt"
+    request.SetAccessKeyId(secretKeyID);
 
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/iam"
-)
+    Aws::IAM::Model::GetAccessKeyLastUsedOutcome outcome = iam.GetAccessKeyLastUsed(
+            request);
 
-// IAMGetAccessKeyLastUsedAPI defines the interface for the GetAccessKeyLastUsed function.
-// We use this interface to test the function using a mocked service.
-type IAMGetAccessKeyLastUsedAPI interface {
-	GetAccessKeyLastUsed(ctx context.Context,
-		params *iam.GetAccessKeyLastUsedInput,
-		optFns ...func(*iam.Options)) (*iam.GetAccessKeyLastUsedOutput, error)
-}
+    if (!outcome.IsSuccess()) {
+        std::cerr << "Error querying last used time for access key " <<
+                  secretKeyID << ":" << outcome.GetError().GetMessage() << std::endl;
+    }
+    else {
+        Aws::String lastUsedTimeString =
+                outcome.GetResult()
+                        .GetAccessKeyLastUsed()
+                        .GetLastUsedDate()
+                        .ToGmtString(Aws::Utils::DateFormat::ISO_8601);
+        std::cout << "Access key " << secretKeyID << " last used at time " <<
+                  lastUsedTimeString << std::endl;
+    }
 
-// WhenWasKeyUsed retrieves when an AWS Identity and Access Management (IAM) access key was last used, including the AWS Region and with which service.
-// Inputs:
-//     c is the context of the method call, which includes the AWS Region.
-//     api is the interface that defines the method call.
-//     input defines the input arguments to the service call.
-// Output:
-//     If successful, a GetAccessKeyLastUsedOutput object containing the result of the service call and nil.
-//     Otherwise, nil and an error from the call to GetAccessKeyLastUsed.
-func WhenWasKeyUsed(c context.Context, api IAMGetAccessKeyLastUsedAPI, input *iam.GetAccessKeyLastUsedInput) (*iam.GetAccessKeyLastUsedOutput, error) {
-	return api.GetAccessKeyLastUsed(c, input)
-}
-
-func main() {
-	keyID := flag.String("k", "", "The ID of the access key")
-	flag.Parse()
-
-	if *keyID == "" {
-		fmt.Println("You must supply the ID of an access key (-k KEY-ID)")
-		return
-	}
-
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		panic("configuration error, " + err.Error())
-	}
-
-	client := iam.NewFromConfig(cfg)
-
-	input := &iam.GetAccessKeyLastUsedInput{
-		AccessKeyId: keyID,
-	}
-
-	result, err := WhenWasKeyUsed(context.TODO(), client, input)
-	if err != nil {
-		fmt.Println("Got an error retrieving when access key was last used:")
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println("The key was last used:", *result.AccessKeyLastUsed)
+    return outcome.IsSuccess();
 }
 ```
-+  For API details, see [GetAccessKeyLastUsed](https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/iam#Client.GetAccessKeyLastUsed) in *AWS SDK for Go API Reference*\. 
++  For API details, see [GetAccessKeyLastUsed](https://docs.aws.amazon.com/goto/SdkForCpp/iam-2010-05-08/GetAccessKeyLastUsed) in *AWS SDK for C\+\+ API Reference*\. 
 
 ------
 #### [ JavaScript ]
 
-**SDK for JavaScript V3**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
-Create the client\.  
-
-```
-import { IAMClient } from "@aws-sdk/client-iam";
-// Set the AWS Region.
-const REGION = "REGION"; // For example, "us-east-1".
-// Create an IAM service client object.
-const iamClient = new IAMClient({ region: REGION });
-export { iamClient };
-```
+**SDK for JavaScript \(v3\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascriptv3/example_code/iam#code-examples)\. 
 Get the access key\.  
 
 ```
-// Import required AWS SDK clients and commands for Node.js.
-import { iamClient } from "./libs/iamClient.js";
-import { GetAccessKeyLastUsedCommand } from "@aws-sdk/client-iam";
+import { GetAccessKeyLastUsedCommand, IAMClient } from "@aws-sdk/client-iam";
 
-// Set the parameters.
-export const params = { AccessKeyId: "ACCESS_KEY_ID" }; //ACCESS_KEY_ID
+const client = new IAMClient({});
 
-export const run = async () => {
-  try {
-    const data = await iamClient.send(new GetAccessKeyLastUsedCommand(params));
-    console.log("Success", data);
-    return data;
-  } catch (err) {
-    console.log("Error", err);
+/**
+ *
+ * @param {string} accessKeyId
+ */
+export const getAccessKeyLastUsed = async (accessKeyId) => {
+  const command = new GetAccessKeyLastUsedCommand({
+    AccessKeyId: accessKeyId,
+  });
+
+  const response = await client.send(command);
+  
+  if (response.AccessKeyLastUsed?.LastUsedDate) {
+    console.log(`
+    ${accessKeyId} was last used by ${response.UserName} via 
+    the ${response.AccessKeyLastUsed.ServiceName} service on
+    ${response.AccessKeyLastUsed.LastUsedDate.toISOString()}
+    `);
   }
+
+  return response;
 };
-run();
 ```
 +  For more information, see [AWS SDK for JavaScript Developer Guide](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/iam-examples-managing-access-keys.html#iam-examples-managing-access-keys-last-used)\. 
 +  For API details, see [GetAccessKeyLastUsed](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-iam/classes/getaccesskeylastusedcommand.html) in *AWS SDK for JavaScript API Reference*\. 
 
-**SDK for JavaScript V2**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
+**SDK for JavaScript \(v2\)**  
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/javascript/example_code/iam#code-examples)\. 
   
 
 ```
@@ -143,7 +110,7 @@ iam.getAccessKeyLastUsed({AccessKeyId: 'ACCESS_KEY_ID'}, function(err, data) {
 #### [ Python ]
 
 **SDK for Python \(Boto3\)**  
- To learn how to set up and run this example, see [GitHub](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam/iam_basics#code-examples)\. 
+ There's more on GitHub\. Find the complete example and learn how to set up and run in the [AWS Code Examples Repository](https://github.com/awsdocs/aws-doc-sdk-examples/tree/main/python/example_code/iam#code-examples)\. 
   
 
 ```
